@@ -62,8 +62,17 @@ CREATE TABLE likes (
   FOREIGN KEY (client_id) REFERENCES client(id)
 );
 
+CREATE TABLE password_reset_tokens (
+  id SERIAL PRIMARY KEY,
+  token VARCHAR(255) NOT NULL,
+  client_id INTEGER NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMP NOT NULL,
+  FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
+);
 
-INSERT INTO client (name,last_name,password,email) VALUES ('Satoshi','Nakamoto','bitcoin','satoshi@bitcoin');
+
+INSERT INTO client (name,last_name,password,email) VALUES ('Satoshi','Nakamoto','bitcoin','mgabiscarfo@gmail.com');
 INSERT INTO client (name,last_name,password,email) VALUES ('Charles','Hoskinson','cardano','charles@cardano');
 INSERT INTO client (name,last_name,password,email) VALUES ('Brad','Garlinghouse','ripple','brad@xrp');
 

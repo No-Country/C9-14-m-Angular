@@ -15,5 +15,4 @@ const pool = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
 });
 
 
-
 module.exports = {pool}

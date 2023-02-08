@@ -2,15 +2,15 @@ const {pool} = require('../index.js')
 const Sequelize = require('sequelize');
 
 
-const Likes = pool.define('likes', {
+const Token = pool.define('password_reset_tokens', {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
-    review_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+    token: {
+        type: Sequelize.STRING,
+        allowNull:false
     },
     client_id: {
         type: Sequelize.INTEGER,
@@ -20,13 +20,16 @@ const Likes = pool.define('likes', {
         type:Sequelize.DATE,
         allowNull:false
     },
-    updated_at : {
+    expires_at : {
         type:Sequelize.DATE,
         allowNull:false
     }
-})
+},{
+    timestamps: false,
+    tableName: 'password_reset_tokens'
+});
 
 
 module.exports = {
-    Likes
+    Token
 }

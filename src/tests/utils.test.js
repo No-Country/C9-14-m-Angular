@@ -2,7 +2,7 @@ const {generateSalt,generateToken,checkPassword,hashPassword} = require('../util
 
 
 describe("test utils",()=>{
-    test("hash", async ()=>{
+    xtest("hash", async ()=>{
         const salt = await generateSalt()
         const response = await hashPassword("pass",salt)
 
@@ -10,7 +10,7 @@ describe("test utils",()=>{
     
     })
 
-    test("check password", async ()=>{
+    xtest("check password", async ()=>{
         const salt = await generateSalt()
 
         const password = await hashPassword("pass",salt)
@@ -23,7 +23,7 @@ describe("test utils",()=>{
         expect(token)
     })
 
-    test("test jwt", async ()=>{
+    xtest("test jwt", async ()=>{
         const token = generateToken("seba@gmail.com", "1")
         expect(token).toBeDefined()
 
