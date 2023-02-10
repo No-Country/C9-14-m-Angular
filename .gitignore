@@ -1,1 +1,7 @@
 node_modules/
+docker_compose-dev-yml
+Dockerfile
+.env.dev
+.env.staging
+.env
+.gitignore
