@@ -4,3 +4,4 @@ Dockerfile
 .env.dev
 .env.staging
 .env
+workflow.yml
