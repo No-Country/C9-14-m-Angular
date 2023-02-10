@@ -3,6 +3,9 @@ const { DB_USER, DB_HOST, DB_PASS, DB_NAME, DB_PORT } = require('../config/confi
 const Sequelize = require('sequelize');
 
 
+console.log(DB_NAME,DB_HOST,DB_PASS)
+
+
 const pool = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   host: DB_HOST,
   dialect: 'postgres',
