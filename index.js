@@ -16,6 +16,6 @@ app.use("/user",userRouter)
 app.use("/film",filmRouter)
 app.use("/review",reviewRouter)
 app.get("/test",(req,res)=>{
-    console.log("testing route")
+        console.log("testing route")
     return res.json({message : "test route"})
 } )

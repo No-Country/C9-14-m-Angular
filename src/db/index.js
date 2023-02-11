@@ -3,11 +3,7 @@ const { DB_USER, DB_HOST, DB_PASS, DB_NAME, DB_PORT } = require('../config/confi
 const Sequelize = require('sequelize');
 
 
-console.log(DB_NAME,DB_HOST,DB_PASS)
-
-
-const pool = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
-  host: DB_HOST,
+const pool = new Sequelize(`postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:5432/${DB_NAME}?sslmode=no-verify`, {
   dialect: 'postgres',
   pool: {
     max: 5,
