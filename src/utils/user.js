@@ -51,6 +51,8 @@ const getGoogleOAuthTokens = async ({code}) => {
     const url = "https://oauth2.googleapis.com/token";
     
     console.log(GOOGLE_REDIRECT_URL_TEST)
+    console.log(GOOGLE_CLIENT_SECRET)
+    console.log(GOOGLE_CLIENT_ID)
   
     const values = {
       code,
