@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const axios = require('axios')
 const qs = require('qs')
-const {APP_SECRET,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_REDIRECT_URL} = require('../config/config.js')
+const {APP_SECRET,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_REDIRECT_URL,GOOGLE_REDIRECT_URL_TEST,GOOGLE_REDIRECT_URL_TEST2} = require('../config/config.js')
 
 const generateSalt = async () => {
 
