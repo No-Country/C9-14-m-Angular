@@ -34,7 +34,4 @@ if (APP_ENV === 'development') {
 
 }
 
-
-
-
 module.exports = {pool}
