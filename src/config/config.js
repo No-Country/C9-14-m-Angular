@@ -1,4 +1,4 @@
-require('custom-env').env('dev')
+require('custom-env').env('staging')
 
 
 const APP_ENV = process.env.APP_ENV

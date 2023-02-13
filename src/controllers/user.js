@@ -2,6 +2,7 @@ const {User,Token} = require('../db/models/models.js')
 const {generateSalt,hashPassword,generateToken,checkPassword,getGoogleOAuthTokens,getGoogleOAuthURL} = require('../utils/user.js')
 const {ServerConnection,Api404Error,BadRequest} = require('../errors/errors.js')
 const crypto = require('crypto')
+const {client} = require('../db/index.js')
 const { Op } = require("sequelize");
 const jwt = require('jsonwebtoken')
 const {EMAIL_USER} = require('../config/config.js')
