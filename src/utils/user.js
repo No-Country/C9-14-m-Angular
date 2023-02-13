@@ -49,12 +49,13 @@ const  getGoogleOAuthURL = () => {
 
 const getGoogleOAuthTokens = async ({code}) => {
     const url = "https://oauth2.googleapis.com/token";
+
   
     const values = {
       code,
       client_id:GOOGLE_CLIENT_ID,
       client_secret: GOOGLE_CLIENT_SECRET,
-      redirect_uri: GOOGLE_REDIRECT_URL,
+      redirect_uri: GOOGLE_REDIRECT_URL_TEST,
       grant_type: "authorization_code",
     };
   
