@@ -312,6 +312,7 @@ const googleSignIn = async (req,res) => {
         secure: false,
       };
 
+    console.log(id_token ,"hi")
     res.cookie("accessToken", id_token , accessTokenCookieOptions);
      
     // res.send(`<div>${googleUser.family_name}</div>`);
