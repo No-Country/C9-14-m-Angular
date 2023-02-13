@@ -50,7 +50,7 @@ const  getGoogleOAuthURL = () => {
 const getGoogleOAuthTokens = async ({code}) => {
     const url = "https://oauth2.googleapis.com/token";
     
-    console.log(code)
+    console.log(GOOGLE_REDIRECT_URL_TEST)
   
     const values = {
       code,
