@@ -17,10 +17,19 @@ const updatedClient = {
   password: "eth",
 }
 
+const updatedClient2 = {
+  name: "Vitalik",
+  last_name: "Buterin",
+}
+const badupdatedClient = {
+  names: "Vitalik",
+  last_names: "Buterin",
+}
+
 const requestNewPassword = {
   email: "mgabiscarfo@gmail.com"
 }
 
   module.exports = {
-    newUser,clientExists,requestNewPassword,updatedClient
+    newUser,clientExists,requestNewPassword,updatedClient,updatedClient2,badupdatedClient
   }
