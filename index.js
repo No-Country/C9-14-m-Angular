@@ -1,15 +1,13 @@
 const express= require('express')
-const http = require('http')
+const cors = require('cors')
 const bodyParser = require('body-parser')
 const userRouter = require('./src/routes/user.js')
 const filmRouter = require('./src/routes/film.js')
 const reviewRouter = require('./src/routes/review.js')
 
 const app = express()
-
-const server = http.createServer(app)
-
-server.listen(4000,()=>console.log("running on port 4000"))
+app.listen(4000,()=>console.log("running on port 4000"))
+app.use(cors());
 app.use(bodyParser.json({limit: "30mb", extended: true}));
 app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
 app.use("/user",userRouter)

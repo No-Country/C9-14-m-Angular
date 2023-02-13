@@ -10,11 +10,13 @@ const {sendEmail} = require('../utils/mailer.js')
 
 const getAll =  async (req,res) => {
 
-    let rows = await User.findAll()
+    // let rows = await User.findAll()
 
-    rows.map((x)=> x.dataValues)
+    // rows.map((x)=> x.dataValues)
 
-    res.send(rows)
+    // res.send(rows)
+
+    res.json({message:"hola"})
 
 }
 
@@ -299,17 +301,25 @@ const googleSignIn = async (req,res) => {
 
     if (!googleUser.email_verified) {
         return res.status(403).send("Google account is not verified");
-      }
+    }
 
-    res.send(`<div>${googleUser.family_name}</div>`);
+    const accessTokenCookieOptions= {
+        maxAge: 900000, // 15 mins
+        httpOnly: false,
+        domain: "localhost",
+        path: "/",
+        sameSite: "lax",
+        secure: false,
+      };
+
+    res.cookie("accessToken", id_token , accessTokenCookieOptions);
+     
+    // res.send(`<div>${googleUser.family_name}</div>`);
+    res.redirect('http://localhost:3000')
     
  } catch (error) {
-
     console.log(error)
-    
  }
-
-
 }
 
 
