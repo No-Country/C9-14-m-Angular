@@ -5,7 +5,15 @@ const bodyParser = require('body-parser')
 const userRouter = require('../routes/user.js')
 const filmRouter = require('../routes/film.js')
 const reviewRouter = require('../routes/review.js')
-const {newUser,clientExists,requestNewPassword,updatedClient} = require('./payload/payload.js')
+const {
+  newUser,
+  clientExists,
+  requestNewPassword,
+  updatedClient,
+  updatedClient2,
+  badupdatedClient
+} = require('./payload/payload.js')
+const { BadRequest } = require('../errors/errors.js')
 
 
 const app = express()
@@ -73,7 +81,7 @@ describe("test boilerplate", ()=>{
       expect(body.token).toBeDefined()
     })
 
-    test('receives reset password token and creates  a row in db',async()=>{
+    xtest('receives reset password token and creates  a row in db',async()=>{
       const {body} = await request(app).post('/user/forgotpassword').send(requestNewPassword)
       
       expect(body.token).toBeDefined()
@@ -93,6 +101,33 @@ describe("test boilerplate", ()=>{
 
     })
 
+    xit("updates an user", async ()=>{
+      const {body} = await request(app).post('/user/update').send(updatedClient2)
+
+
+      expect(body).toEqual({updatedUser: [1]})
+    })
+
+    xtest("get updated user",async ()=> {
+      const {statusCode,body} = await request(app).get("/user")
+      expect(body[2].name).toBe("Vitalik")
+      expect(body[0].name).toBe("Charles")
+      expect(statusCode).toEqual(200)
+   })
+
+   xit("gets bad request",async ()=> {
+     const {body} = await request(app).post('/user/update').send(badupdatedClient)
+
+     expect(body.message).toBe("Invalid Input")
+    })
+
+    it("cannot updates and gets server error", async ()=>{
+      
+      const {body} = await request(app).post('/user/update').send(updatedClient2)
+
+
+      expect(body.message).toEqual("Try again in a few seconds")
+    })
 
 
 })

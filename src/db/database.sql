@@ -1,6 +1,6 @@
-SELECT 'CREATE DATABASE nocountryapp'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'nocountryapp')\gexec
-\connect nocountryapp
+SELECT 'CREATE DATABASE testserial'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'testserial')\gexec
+\connect testserial
 
 CREATE TABLE client (
     id SERIAL PRIMARY KEY,
@@ -70,6 +70,19 @@ CREATE TABLE password_reset_tokens (
   expires_at TIMESTAMP NOT NULL,
   FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
 );
+
+CREATE OR REPLACE FUNCTION update_updated_at_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_updated_at
+AFTER UPDATE ON client
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_trigger();
 
 
 INSERT INTO client (name,last_name,password,email) VALUES ('Satoshi','Nakamoto','bitcoin','mgabiscarfo@gmail.com');

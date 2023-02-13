@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const {APP_SECRET} = require('../config/config.js')
+const axios = require('axios')
+const qs = require('qs')
+const {APP_SECRET,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_REDIRECT_URL} = require('../config/config.js')
 
 const generateSalt = async () => {
 
@@ -24,10 +26,61 @@ const generateToken =  (id,email) => {
     return  jwt.sign({id,email},APP_SECRET,{expiresIn:"1hr"})
 }
 
+const  getGoogleOAuthURL = () => {
+    const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+  
+    const options = {
+      redirect_uri: GOOGLE_REDIRECT_URL,
+      client_id: GOOGLE_CLIENT_ID,
+      access_type: "offline",
+      response_type: "code",
+      prompt: "consent",
+      scope: [
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+      ].join(" "),
+    };
+  
+    const query = new URLSearchParams(options);
+  
+    return `${rootUrl}?${query.toString()}`;
+  }
+
+
+const getGoogleOAuthTokens = async ({code}) => {
+    const url = "https://oauth2.googleapis.com/token";
+  
+    const values = {
+      code,
+      client_id:GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      redirect_uri: GOOGLE_REDIRECT_URL,
+      grant_type: "authorization_code",
+    };
+  
+    try {
+      const res = await axios.post(
+        url,
+        qs.stringify(values),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+  
 module.exports = {
     generateSalt,
     hashPassword,
     checkPassword,
-    generateToken
+    generateToken,
+    getGoogleOAuthURL,
+    getGoogleOAuthTokens
 
 }

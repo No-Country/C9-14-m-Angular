@@ -1,9 +1,10 @@
 const {User,Token} = require('../db/models/models.js')
-const {generateSalt,hashPassword,generateToken,checkPassword} = require('../utils/user.js')
+const {generateSalt,hashPassword,generateToken,checkPassword,getGoogleOAuthTokens,getGoogleOAuthURL} = require('../utils/user.js')
 const {ServerConnection,Api404Error,BadRequest} = require('../errors/errors.js')
 const crypto = require('crypto')
 const {client} = require('../db/index.js')
 const { Op } = require("sequelize");
+const jwt = require('jsonwebtoken')
 const {EMAIL_USER} = require('../config/config.js')
 const {sendEmail} = require('../utils/mailer.js')
 
@@ -17,6 +18,43 @@ const getAll =  async (req,res) => {
 
 }
 
+const updateUser = async (req,res) => {
+
+    const { email, password, name, last_name } = req.body;
+
+    try {
+
+        if (email || password || name || last_name) {
+
+            const updatedUser =  await User.update({ email,password,name,last_name }, {
+                where: {
+                  id: 1
+                }
+            });
+
+            res.send({updatedUser})
+
+        } else {
+
+            throw new BadRequest("Invalid Input")
+
+        }
+
+    } catch (error) {
+        
+        if (error?.statusCode) {
+
+            res.status(error.statusCode).send({message: error.name})
+
+        } else {
+
+            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
+
+            res.status(error.statusCode).send({message: error.name})
+        }
+    }
+}
+
 const signUp = async(req,res) => {
     const { email, password, name, last_name } = req.body;
 
@@ -24,7 +62,7 @@ const signUp = async(req,res) => {
 
         if (!email || !password || !name || !last_name) {
 
-            return res.status(400).json({ message: "Please check the form information" });
+            throw new BadRequest("Invalid Input")
 
         }
         const client = await User.findAll({
@@ -33,7 +71,7 @@ const signUp = async(req,res) => {
             }
         })
 
-        if (client.length) return res.status(400).json({ message: "User already exists" });
+        if (client.length) throw new BadRequest("User already exists")
 
         const salt = await generateSalt()
         const hashedPassword = await hashPassword(password,salt)
@@ -53,8 +91,17 @@ const signUp = async(req,res) => {
 
         
     } catch (error) {
-        console.log(error)
-        throw new ServerConnection
+
+        if (error?.statusCode) {
+
+            res.status(error.statusCode).send({message: error.name})
+
+        } else {
+
+            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
+
+            res.status(error.statusCode).send({message: error.name})
+        }
     }
 
 }
@@ -66,7 +113,7 @@ try {
 
     if (!email || !password) {
 
-        return res.status(400).json({ message: "Please check the form information" });
+        throw new BadRequest("Invalid Input")
 
     }
     
@@ -78,11 +125,11 @@ try {
 
     let dataValues = response[0]?.dataValues
 
-    if (!dataValues) return res.status(400).json({ message: "User doesn't exist" });
+    if (!dataValues) throw new BadRequest("User Doesn't exist")
 
     const isPasswordCorrect = await checkPassword(password,dataValues.password)
 
-    if (!isPasswordCorrect) return res.status(400).json({ message: "Wrong Password" });
+    if (!isPasswordCorrect) throw new BadRequest("Wrong Password")
 
     const token = generateToken(dataValues?.id,dataValues?.email)
 
@@ -90,8 +137,16 @@ try {
 
 } catch (error) {
 
-    // throw new ServerConnection
-    console.log(error)
+    if (error?.statusCode) {
+
+        res.status(error.statusCode).send({message: error.name})
+
+    } else {
+
+        const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
+
+        res.status(error.statusCode).send({message: error.name})
+    }
 
 }
 
@@ -102,16 +157,16 @@ const forgotPassword = async (req,res) => {
     
     try {
 
-        const [{dataValues}] = await User.findAll({
+        const response = await User.findAll({
+
             where : {
                 email : email
             }
         })
 
-        console.log(dataValues, "I find a user")
+        if (!response.length) throw new BadRequest("User Doesn't exist")
 
-    
-        if (!dataValues) return res.status(400).json({ message: "User doesn't exist" });
+        let [{dataValues}] = response
     
         let [token] = await Token.findAll({
             where: {
@@ -128,8 +183,6 @@ const forgotPassword = async (req,res) => {
         }
     
         let resetToken = crypto.randomBytes(32).toString("hex")
-
-        console.log(resetToken)
     
         const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex")
     
@@ -155,15 +208,23 @@ const forgotPassword = async (req,res) => {
 
             await sendEmail(subject,message,receiver,sender)
 
-            res.status(400).json({ message: "check mailbox for password reset" })
+            res.status(200).json({ message: "check mailbox for password reset" })
           
           } catch (error) {
             console.log(error)
           }
           
     } catch (error) {
-        // throw new ServerConnection
-        console.log(error)
+        if (error?.statusCode) {
+
+            res.status(error.statusCode).send({message: error.name})
+    
+        } else {
+    
+            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
+    
+            res.status(error.statusCode).send({message: error.name})
+        }
     }
 
 }
@@ -177,7 +238,7 @@ const establishNewPassword = async (req,res) => {
 
         const hashedToken = crypto.createHash("sha256").update(token).digest("hex")
 
-        let [{dataValues}] = await Token.findAll({
+        let response = await Token.findAll({
             where: {
                 token: hashedToken,
                 expires_at: {
@@ -186,9 +247,11 @@ const establishNewPassword = async (req,res) => {
             }
         })
 
-        if (!dataValues) {
-            return res.status(400).json({ message: "Invalid Token" });
+        if (!response.length) {
+           throw new BadRequest("Invalid Token")
         }
+
+        const [{dataValues}] = response
 
         const salt = await generateSalt()
         const hashedPassword = await hashPassword(password,salt)
@@ -203,14 +266,56 @@ const establishNewPassword = async (req,res) => {
 
 
     } catch (error) {
-        // throw new ServerConnection
-        console.log(error)
+        if (error?.statusCode) {
+
+            res.status(error.statusCode).send({message: error.name})
+    
+        } else {
+    
+            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
+    
+            res.status(error.statusCode).send({message: error.name})
+        }
     }
 }
 
+const googleRequest = (req,res) => {
 
-//check jest test for password recovery. 
+   const googleUrl = getGoogleOAuthURL()
+
+    res.send(`<a href=${googleUrl}>Authenticate with Google</a>`);
+
+}
+
+const googleSignIn = async (req,res) => {
+
+ try {
+
+    const code = req.query.code
+
+    const { id_token, access_token } = await getGoogleOAuthTokens({ code });
+
+    const googleUser =  jwt.decode(id_token)
+
+    if (!googleUser.email_verified) {
+        return res.status(403).send("Google account is not verified");
+      }
+
+    res.send(`<div>${googleUser.family_name}</div>`);
+    
+ } catch (error) {
+
+    console.log(error)
+    
+ }
+
+
+}
+
+
+//check jest test for password recovery.
+//check unordered client table after update 
 
 module.exports = {
-    getAll,signUp,signIn,forgotPassword,establishNewPassword
+    getAll,signUp,signIn,forgotPassword,establishNewPassword,googleRequest,googleSignIn,updateUser
 }
