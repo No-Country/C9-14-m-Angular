@@ -322,8 +322,9 @@ const googleSignIn = async (req,res) => {
             name: googleUser.name,
             last_name: googleUser.family_name,
             password:hashedPassword,
-            email: googleUser.email
-          }, { fields: ['name','password','last_name','email'] });
+            email: googleUser.email,
+            google: true
+          }, { fields: ['name','password','last_name','email','google'] });
 
           
         const token = generateToken(dataValues.id,dataValues.email)
