@@ -307,7 +307,7 @@ const googleSignIn = async (req,res) => {
     const accessTokenCookieOptions= {
         maxAge: 900000, // 15 mins
         httpOnly: false,
-        domain: "http://localhost:3000",
+        domain: "localhost",
         path: "/",
         sameSite: "none",
         secure: true,
@@ -318,7 +318,7 @@ const googleSignIn = async (req,res) => {
     res.cookie("accessToken", id_token , accessTokenCookieOptions);
      
     // res.send(`<div>${googleUser.family_name}</div>`);
-    // res.redirect('http://localhost:3000')
+    res.redirect('http://localhost:3000')
     
  } catch (error) {
     console.log(error)
