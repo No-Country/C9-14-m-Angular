@@ -310,7 +310,7 @@ const googleSignIn = async (req,res) => {
         domain: "localhost",
         path: "/",
         sameSite: "none",
-        secure: false,
+        secure: true,
       };
 
     console.log(id_token ,"hi")
