@@ -313,7 +313,6 @@ const googleSignIn = async (req,res) => {
         secure: false,
       };
 
-    console.log(id_token ,"hi")
 
     try {
         res.cookie("accessToken", id_token , accessTokenCookieOptions);
