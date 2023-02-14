@@ -307,7 +307,7 @@ const googleSignIn = async (req,res) => {
     const accessTokenCookieOptions= {
         maxAge: 900000, // 15 mins
         httpOnly: false,
-        domain: "localhost",
+        domain: "localhost:3000",
         path: "/",
         sameSite: "none",
         secure: false,
