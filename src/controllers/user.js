@@ -293,10 +293,11 @@ const googleSignIn = async (req,res) => {
 
  try {
 
-    const code = req.query.code
+    // const code = req.query.code
 
+    const {id_token} = req.params
 
-    const { id_token, access_token } = await getGoogleOAuthTokens({ code });
+    // const { id_token, access_token } = await getGoogleOAuthTokens({ code });
 
     const googleUser =  jwt.decode(id_token)
 
@@ -304,27 +305,72 @@ const googleSignIn = async (req,res) => {
         return res.status(403).send("Google account is not verified");
     }
 
-    const accessTokenCookieOptions= {
-        maxAge: 900000, // 15 mins
-        httpOnly: false,
-        domain: "localhost",
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      };
+    const response = await User.findAll({
+        where : {
+            email : googleUser.email
+        }
+    })
 
-    console.log(id_token ,"hi")
+    const client = response[0]?.dataValues
 
-    res.cookie("accessToken", id_token , accessTokenCookieOptions);
-     
-    // res.send(`<div>${googleUser.family_name}</div>`);
-    res.redirect('http://localhost:3000')
-    
+    if (response.length < 1) {
+
+        const salt = await generateSalt()
+        const hashedPassword = await hashPassword(googleUser.at_hash ,salt)
+
+        const {dataValues} = await User.create({
+            name: googleUser.name,
+            last_name: googleUser.family_name,
+            password:hashedPassword,
+            email: googleUser.email
+          }, { fields: ['name','password','last_name','email'] });
+
+          
+        const token = generateToken(dataValues.id,dataValues.email)
+
+        res.send({dataValues,token})
+
+    } else if (client.google === false) {
+
+        let updatedUser = await User.update({google:true},{
+            where: {
+                id: client.id
+            }
+        })
+
+        const token = generateToken(client.id,client.email)
+
+        res.send({result: client, token})
+
+    } else if (client.google === true) {
+
+
+        const token = generateToken(client.id,client.email)
+
+        res.send({result: client, token})
+
+    }
+
  } catch (error) {
     console.log(error)
  }
 }
 
+
+    // const accessTokenCookieOptions= {
+    //     maxAge: 900000, // 15 mins
+    //     httpOnly: false,
+    //     domain: "localhost",
+    //     path: "/",
+    //     sameSite: "lax",
+    //     secure: false,
+    //   };
+
+    // res.cookie("accessToken", id_token , accessTokenCookieOptions);
+     
+    // res.send(`<div>${googleUser.family_name}</div>`);
+    // res.redirect('http://localhost:3000')
+    
 
 //check jest test for password recovery.
 //check unordered client table after update 

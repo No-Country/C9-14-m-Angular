@@ -16,6 +16,10 @@ const User = pool.define('client', {
       type: Sequelize.STRING,
       allowNull: false
     },
+    google: {
+    type: Sequelize.BOOLEAN,
+    allowNull:true
+    },
     password: {
       type: Sequelize.STRING,
       allowNull: false
