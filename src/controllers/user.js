@@ -309,12 +309,19 @@ const googleSignIn = async (req,res) => {
         httpOnly: false,
         domain: "localhost",
         path: "/",
-        sameSite: "lax",
+        sameSite: "none",
         secure: false,
       };
 
     console.log(id_token ,"hi")
-    res.cookie("accessToken", id_token , accessTokenCookieOptions);
+
+    try {
+        res.cookie("accessToken", id_token , accessTokenCookieOptions);
+
+    } catch (error) {
+        console.log(error)
+    }
+
      
     // res.send(`<div>${googleUser.family_name}</div>`);
     res.redirect('http://localhost:3000')
