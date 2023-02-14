@@ -307,23 +307,19 @@ const googleSignIn = async (req,res) => {
     const accessTokenCookieOptions= {
         maxAge: 900000, // 15 mins
         httpOnly: false,
-        domain: "localhost:3000",
+        domain: "localhost",
         path: "/",
         sameSite: "none",
         secure: false,
       };
 
+    console.log(id_token ,"hi")
 
-    try {
-        res.cookie("accessToken", id_token , accessTokenCookieOptions);
-
-    } catch (error) {
-        console.log(error)
-    }
-
+    res.cookie("accessToken", id_token , accessTokenCookieOptions);
      
     // res.send(`<div>${googleUser.family_name}</div>`);
-    res.redirect('http://localhost:3000')
+    // res.redirect('http://localhost:3000')
+    res.render('http://localhost:3000')
     
  } catch (error) {
     console.log(error)
