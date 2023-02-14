@@ -7,6 +7,7 @@ CREATE TABLE client (
     name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     password VARCHAR(255) NOT NULL,
+    google BOOLEAN DEFAULT FALSE,
     email VARCHAR(50) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -85,7 +86,7 @@ FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_trigger();
 
 
-INSERT INTO client (name,last_name,password,email) VALUES ('Satoshi','Nakamoto','bitcoin','mgabiscarfo@gmail.com');
+INSERT INTO client (name,last_name,password,email) VALUES ('Satoshi','Nakamoto','bitcoin','sebafraga0@gmail.com');
 INSERT INTO client (name,last_name,password,email) VALUES ('Charles','Hoskinson','cardano','charles@cardano');
 INSERT INTO client (name,last_name,password,email) VALUES ('Brad','Garlinghouse','ripple','brad@xrp');
 

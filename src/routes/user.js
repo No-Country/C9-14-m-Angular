@@ -4,7 +4,7 @@ const router = express.Router()
 
 router.get("/", getAll)
 router.get('/signin/request', googleRequest)
-router.get('/signin/oauth',googleSignIn)
+router.get('/signin/oauth/:id_token',googleSignIn)
 
 
 router.post("/signup", signUp)
