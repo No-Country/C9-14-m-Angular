@@ -9,13 +9,24 @@ const {sendEmail} = require('../utils/mailer.js')
 
 const getAll =  async (req,res) => {
 
-    // let rows = await User.findAll()
+try {
+    
+    let rows = await User.findAll({
+        order: [
+            ['id', 'ASC']
+        ]
+    })
 
-    // rows.map((x)=> x.dataValues)
+    rows.map((x)=> x.dataValues)
 
-    // res.send(rows)
+    res.send(rows)
 
-    res.json({message:"hola"})
+} catch (error) {
+    
+
+    const newerror = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
+
+    res.status(newerror.statusCode).send({message: newerror.name})}
 
 }
 
@@ -292,16 +303,13 @@ const googleSignIn = async (req,res) => {
 
  try {
 
-    // const code = req.query.code
 
     const {id_token} = req.params
-
-    // const { id_token, access_token } = await getGoogleOAuthTokens({ code });
 
     const googleUser =  jwt.decode(id_token)
 
     if (!googleUser.email_verified) {
-        return res.status(403).send("Google account is not verified");
+        throw new BadRequest ("Google account is not verified")
     }
 
     const response = await User.findAll({
@@ -351,28 +359,23 @@ const googleSignIn = async (req,res) => {
     }
 
  } catch (error) {
-    console.log(error)
- }
+
+    if (error?.statusCode) {
+
+        res.status(error.statusCode).send({message: error.name})
+
+    } else {
+
+        const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
+
+        res.status(error.statusCode).send({message: error.name})
+    }
+
 }
-
-
-    // const accessTokenCookieOptions= {
-    //     maxAge: 900000, // 15 mins
-    //     httpOnly: false,
-    //     domain: "localhost",
-    //     path: "/",
-    //     sameSite: "lax",
-    //     secure: false,
-    //   };
-
-    // res.cookie("accessToken", id_token , accessTokenCookieOptions);
-     
-    // res.send(`<div>${googleUser.family_name}</div>`);
-    // res.redirect('http://localhost:3000')
+}
     
 
 //check jest test for password recovery.
-//check unordered client table after update 
 
 module.exports = {
     getAll,signUp,signIn,forgotPassword,establishNewPassword,googleRequest,googleSignIn,updateUser

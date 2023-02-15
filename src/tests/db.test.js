@@ -11,7 +11,8 @@ const {
   requestNewPassword,
   updatedClient,
   updatedClient2,
-  badupdatedClient
+  badupdatedClient,
+  clientExistSignin
 } = require('./payload/payload.js')
 const { BadRequest } = require('../errors/errors.js')
 
@@ -37,8 +38,8 @@ afterAll((done)=> {
     done()
 })
 
-describe("test boilerplate", ()=>{
-    xtest("get existing user",async ()=> {
+xdescribe("test boilerplate", ()=>{
+    test("get existing user",async ()=> {
        const response = await request(app).get("/user")
 
        expect(response.body[0].name).toBe("Satoshi")
@@ -46,26 +47,26 @@ describe("test boilerplate", ()=>{
 
     })
 
-    xtest ("get existing film", async ()=> {
+    test ("get existing film", async ()=> {
       const {body} = await request(app).get('/film')
 
       expect(body[0].title).toBe('guardian')
     })
 
-    xtest ('get review from existing film', async()=>{
+    test ('get review from existing film', async()=>{
       const {body} = await request(app).get('/review')
 
       expect(body[0].comment).toBe('Amazing Movie')
 
     })
 
-    xtest('finds existing user', async()=> {
+    test('finds existing user', async()=> {
       const {body} = await request(app).post('/user/signup').send(clientExists)
 
       expect(body).toEqual({message:"User already exists" })
     })
 
-    xtest("inserts new User", async()=> {
+    test("inserts new User", async()=> {
       const {body} = await request(app).post('/user/signup').send(newUser)
 
       const response = await request(app).get("/user")
@@ -74,7 +75,7 @@ describe("test boilerplate", ()=>{
       expect(response.body.length).toEqual(4)
     })
 
-    xtest("signs in an existing user", async()=> {
+    test("signs in an existing user", async()=> {
       const {body} = await request(app).post('/user/signin').send(newUser)
 
       expect(body.dataValues.name).toBe('Ed')
@@ -101,34 +102,51 @@ describe("test boilerplate", ()=>{
 
     })
 
-    xit("updates an user", async ()=>{
+    it("updates an user", async ()=>{
       const {body} = await request(app).post('/user/update').send(updatedClient2)
 
 
       expect(body).toEqual({updatedUser: [1]})
     })
 
-    xtest("get updated user",async ()=> {
+    test("get updated user",async ()=> {
       const {statusCode,body} = await request(app).get("/user")
-      expect(body[2].name).toBe("Vitalik")
-      expect(body[0].name).toBe("Charles")
+      expect(body[0].name).toBe("Vitalik")
+      expect(body[1].name).toBe("Charles")
       expect(statusCode).toEqual(200)
    })
 
-   xit("gets bad request",async ()=> {
+   it("gets bad request",async ()=> {
      const {body} = await request(app).post('/user/update').send(badupdatedClient)
 
      expect(body.message).toBe("Invalid Input")
     })
 
-    it("cannot updates and gets server error", async ()=>{
+})
+
+describe("test errors without db connected", () => {
+
+  
+  xit("receives error because cannot access databse",async ()=> {
+    const response = await request(app).get("/user")
+
+    expect(response.body.message).toEqual("Connetion to server failed. Please try again in a few seconds")
+    expect(response.statusCode).toEqual(500)
+    expect(response.error).toBeDefined()
+ })
+
+ xit("cannot updates and gets server error", async ()=>{
       
-      const {body} = await request(app).post('/user/update').send(updatedClient2)
+  const {body} = await request(app).post('/user/update').send(updatedClient2)
 
+  expect(body.message).toEqual("Connetion to server failed. Please try again in a few seconds")
+})
 
-      expect(body.message).toEqual("Try again in a few seconds")
-    })
+xit("cannot sign in and gets server error", async()=> {
+  const{body} = await request(app).post('/user/signin').send(clientExistSignin)
 
+  expect(body.message).toEqual("Connetion to server failed. Please try again in a few seconds")
+})
 
 })
 

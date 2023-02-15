@@ -6,11 +6,16 @@ const newUser = {
 }
 
 const clientExists = {
-    email: "satoshi@bitcoin",
+    email: "sebafraga0@gmail.com",
     password: "1",
     name: "Satoshi",
     last_name: "Nakamoto"
-  }
+}
+
+const clientExistSignin = {
+  email:  "sebafraga0@gmail.com",
+  password: 'bitcoin'
+}
 
 const updatedClient = {
   email: "satoshi@bitcoin",
@@ -31,5 +36,5 @@ const requestNewPassword = {
 }
 
   module.exports = {
-    newUser,clientExists,requestNewPassword,updatedClient,updatedClient2,badupdatedClient
+    newUser,clientExists,requestNewPassword,updatedClient,updatedClient2,badupdatedClient,clientExistSignin
   }
