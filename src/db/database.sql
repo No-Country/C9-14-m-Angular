@@ -13,9 +13,18 @@ CREATE TABLE client (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE list (
+    id SERIAL PRIMARY KEY,
+    description VARCHAR(50) NOT NULL,
+    client_id INT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (client_id) REFERENCES client(id)
+);
+
 CREATE TABLE film (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(50) NOT NULL,
+    title VARCHAR(50) UNIQUE NOT NULL,
     year INT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -63,6 +72,26 @@ CREATE TABLE likes (
   FOREIGN KEY (client_id) REFERENCES client(id)
 );
 
+CREATE TABLE list_likes (
+  id SERIAL PRIMARY KEY,
+  list_id INT NOT NULL,
+  client_id INT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  FOREIGN KEY (list_id) REFERENCES list(id) ON DELETE CASCADE,
+  FOREIGN KEY (client_id) REFERENCES client(id)
+);
+
+CREATE TABLE list_movies (
+    id SERIAL PRIMARY KEY,
+    list_id INT NOT NULL,
+    film_id INT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    FOREIGN KEY (film_id) REFERENCES film(id),
+    FOREIGN KEY (list_id) REFERENCES list(id) ON DELETE CASCADE
+);
+
 CREATE TABLE password_reset_tokens (
   id SERIAL PRIMARY KEY,
   token VARCHAR(255) NOT NULL,
@@ -94,11 +123,27 @@ INSERT INTO film (title,year) VALUES ('guardian','2020');
 INSERT INTO film (title,year) VALUES ('lift','2021');
 INSERT INTO film (title,year) VALUES ('innovation','2022');
 
+
+
 INSERT INTO review (client_id,film_id,rating,comment) VALUES ('1','1','4','Amazing Movie');
 INSERT INTO connection (followed_id,follower_id) VALUES ('1','2');
 
 INSERT INTO watchlist (film_id,client_id) VALUES ('1','1');
 INSERT INTO likes (review_id,client_id) VALUES ('1','2');
+
+INSERT INTO list (description, client_id) VALUES ('my fav','2');
+INSERT INTO list (description, client_id) VALUES ('my list','1');
+
+
+INSERT INTO list_movies (list_id,film_id) VALUES ('1','1');
+INSERT INTO list_movies (list_id,film_id) VALUES ('1','2');
+INSERT INTO list_movies (list_id,film_id) VALUES ('1','3');
+
+
+INSERT INTO list_likes (list_id,client_id) VALUES ('1','1');
+INSERT INTO list_likes (list_id,client_id) VALUES ('1','3');
+
+
 
 
 

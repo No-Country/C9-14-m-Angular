@@ -18,11 +18,9 @@ const Film = pool.define('film', {
     },
     created_at : {
         type:Sequelize.DATE,
-        allowNull:false
     },
     updated_at : {
         type:Sequelize.DATE,
-        allowNull:false
     }
 },{
     timestamps: false,

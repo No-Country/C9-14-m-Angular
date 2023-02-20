@@ -1,11 +1,12 @@
 const {User,Token} = require('../db/models/models.js')
 const {generateSalt,hashPassword,generateToken,checkPassword,getGoogleOAuthTokens,getGoogleOAuthURL} = require('../utils/user.js')
 const {ServerConnection,Api404Error,BadRequest} = require('../errors/errors.js')
+const {EMAIL_USER} = require('../config/config.js')
+const {sendEmail} = require('../utils/mailer.js')
 const crypto = require('crypto')
 const { Op } = require("sequelize");
 const jwt = require('jsonwebtoken')
-const {EMAIL_USER} = require('../config/config.js')
-const {sendEmail} = require('../utils/mailer.js')
+
 
 const getAll =  async (req,res) => {
 

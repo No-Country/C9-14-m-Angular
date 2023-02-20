@@ -24,6 +24,9 @@ const Likes = pool.define('likes', {
         type:Sequelize.DATE,
         allowNull:false
     }
+},{
+    timestamps: false,
+    tableName: 'likes'
 })
 
 

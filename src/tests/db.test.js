@@ -4,6 +4,8 @@ const request = require('supertest')
 const bodyParser = require('body-parser')
 const userRouter = require('../routes/user.js')
 const filmRouter = require('../routes/film.js')
+const listRouter = require('../routes/list.js')
+
 const reviewRouter = require('../routes/review.js')
 const {
   newUser,
@@ -12,7 +14,11 @@ const {
   updatedClient,
   updatedClient2,
   badupdatedClient,
-  clientExistSignin
+  clientExistSignin,
+  createnonExistList,
+  updateExistListRemove,
+  updateExistListAdd,
+  addExistingfilms
 } = require('./payload/payload.js')
 const { BadRequest } = require('../errors/errors.js')
 
@@ -30,6 +36,7 @@ beforeAll( ()=>{
   app.use("/user",userRouter)
   app.use("/film",filmRouter)
   app.use("/review",reviewRouter)
+  app.use("/list", listRouter)
 })
 
 afterAll((done)=> {
@@ -124,7 +131,7 @@ xdescribe("test boilerplate", ()=>{
 
 })
 
-describe("test errors without db connected", () => {
+xdescribe("test errors without db connected", () => {
 
   
   xit("receives error because cannot access databse",async ()=> {
@@ -148,5 +155,70 @@ xit("cannot sign in and gets server error", async()=> {
   expect(body.message).toEqual("Connetion to server failed. Please try again in a few seconds")
 })
 
+})
+
+describe("test list controller", ()=>{
+  xtest("all lists retrieval", async ()=>{
+    const {body} = await request(app).get('/list')
+
+    console.log(body[0].list_movies)
+
+    expect(body[0]).toHaveProperty("list_movies")
+    expect(body[0].id).toEqual(1)
+
+  })
+
+  xtest("creates a list", async() => {
+    const {body} = await request(app).post('/list/create').send(createnonExistList)
+
+    expect(body.id).toEqual(body.list_movies[0].list_id)
+    expect(body.list_movies.length).toEqual(createnonExistList.films.length)
+
+  })
+
+
+  xtest("removes 3 films from a list succesfully", async()=> {
+    const {body} = await request(app).post('/list/remove').send(updateExistListRemove)
+    const response = await request(app).post('/list/remove').send(updateExistListRemove)
+
+    expect(body).toEqual(updateExistListRemove.films.length)
+    expect(response.body.message).toEqual("List doesn't have any Series")
+
+  })
+
+  xtest("adds 3 films to an existing list succesfully", async()=>{
+    const existingList = await request(app).get('/list/1')
+    const {body} = await request(app).post('/list/add').send(updateExistListAdd)
+    const response = await request(app).post('/list/add').send(addExistingfilms)
+    const checkDuplicates = await request(app).get('/film')
+    const updatedexistingList = await request(app).get('/list/1')
+
+    //check that we have added succesfully the movies
+    expect(body.length).toEqual(updateExistListAdd.films.length)
+
+    // check that we have created with association
+    expect(body[0]).toHaveProperty('film')
+
+    expect(response.body[0]).toHaveProperty('list_id')
+
+    // if the films to be added already exist, we dont create it, but we add the existing one to the list
+    expect(checkDuplicates.body.duplicates).toEqual(false)
+
+    //checking that the list has increased its size by the length of the film request to add
+    expect(updatedexistingList.body.length).toEqual(existingList.body.length + updateExistListAdd.films.length)
+
+  })
+
+  xtest("deletes list succesfully", async()=>{
+    const {body} = await request(app).delete('/list/remove/1')
+    const nonExistingList = await request(app).get('/list/1')
+
+    expect(body).toEqual(1)
+
+    //check that removed no longer exists in the db
+
+    expect(nonExistingList.body.message).toEqual("Non existing List")
+
+  })
 })
 

@@ -2,7 +2,7 @@ const {pool} = require('../index.js')
 const Sequelize = require('sequelize');
 
 
-const Watchlist = ('watchlist', {
+const Watchlist = pool.define('watchlist', {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
