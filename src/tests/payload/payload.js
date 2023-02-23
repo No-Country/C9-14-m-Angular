@@ -6,19 +6,19 @@ const newUser = {
 }
 
 const clientExists = {
-    email: "sebafraga0@gmail.com",
-    password: "1",
+    email: "angular14m@gmail.com",
+    password: "Angular14%",
     name: "Satoshi",
     last_name: "Nakamoto"
 }
 
 const clientExistSignin = {
-  email:  "sebafraga0@gmail.com",
-  password: 'bitcoin'
+  email:  "angular14m@gmail.com",
+  password: 'Angular14%'
 }
 
 const updatedClient = {
-  email: "satoshi@bitcoin",
+  email: "angular14m@gmail.com",
   password: "eth",
 }
 
@@ -42,6 +42,14 @@ const createnonExistList = {
   films: [
     {title: "john wick", year: 2010 },
     {title: "john wick2", year: 2014}
+  ]
+}
+
+const cloneList = {
+  userId : 3,
+  description: "my fav",
+  films : [
+    1,2,3
   ]
 }
 
@@ -80,5 +88,6 @@ const addExistingfilms =  {
     createnonExistList,
     updateExistListRemove,
     updateExistListAdd,
-    addExistingfilms
+    addExistingfilms,
+    cloneList
   }

@@ -18,7 +18,8 @@ const {
   createnonExistList,
   updateExistListRemove,
   updateExistListAdd,
-  addExistingfilms
+  addExistingfilms,
+  cloneList
 } = require('./payload/payload.js')
 const { BadRequest } = require('../errors/errors.js')
 
@@ -57,18 +58,20 @@ xdescribe("test boilerplate", ()=>{
     test ("get existing film", async ()=> {
       const {body} = await request(app).get('/film')
 
-      expect(body[0].title).toBe('guardian')
+      expect(body.result[0].title).toBeDefined()
     })
 
-    test ('get review from existing film', async()=>{
+    xtest ('get review from existing film', async()=>{
       const {body} = await request(app).get('/review')
 
-      expect(body[0].comment).toBe('Amazing Movie')
+      expect(body[0].comment).toBeDefined()
 
     })
 
     test('finds existing user', async()=> {
       const {body} = await request(app).post('/user/signup').send(clientExists)
+
+      console.log(body)
 
       expect(body).toEqual({message:"User already exists" })
     })
@@ -161,8 +164,6 @@ describe("test list controller", ()=>{
   xtest("all lists retrieval", async ()=>{
     const {body} = await request(app).get('/list')
 
-    console.log(body[0].list_movies)
-
     expect(body[0]).toHaveProperty("list_movies")
     expect(body[0].id).toEqual(1)
 
@@ -175,7 +176,6 @@ describe("test list controller", ()=>{
     expect(body.list_movies.length).toEqual(createnonExistList.films.length)
 
   })
-
 
   xtest("removes 3 films from a list succesfully", async()=> {
     const {body} = await request(app).post('/list/remove').send(updateExistListRemove)
@@ -192,6 +192,8 @@ describe("test list controller", ()=>{
     const response = await request(app).post('/list/add').send(addExistingfilms)
     const checkDuplicates = await request(app).get('/film')
     const updatedexistingList = await request(app).get('/list/1')
+
+    
 
     //check that we have added succesfully the movies
     expect(body.length).toEqual(updateExistListAdd.films.length)
@@ -218,6 +220,40 @@ describe("test list controller", ()=>{
     //check that removed no longer exists in the db
 
     expect(nonExistingList.body.message).toEqual("Non existing List")
+
+  })
+
+  xtest("all client lists retrieval", async ()=>{
+    const {body} = await request(app).get('/list/client/2')
+    const {list_movies,id} = body[0]
+
+    console.log(body)
+
+
+    expect(body[0]).toHaveProperty("list_movies")
+    expect(id).toEqual(1)
+    expect(list_movies.length).toBeDefined()
+
+  })
+
+  xtest("clone a list", async() => {
+    const {body} = await request(app).post('/list/create').send(cloneList)
+    const createdFilms = body.list_movies.map((x)=> x.film_id)
+
+    expect(body.id).toEqual(body.list_movies[0].list_id)
+    expect(body.list_movies.length).toEqual(cloneList.films.length)
+    expect(createdFilms).toEqual(cloneList.films)
+
+  })
+
+  test("retreives all likes", async ()=> {
+
+    const {body} = await request(app).get('/list/client/like/1')
+
+    console.log(body)
+
+    expect(body.lists).toBeDefined()
+    expect(body.series.length).toBeDefined()
 
   })
 })

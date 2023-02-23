@@ -83,7 +83,7 @@ const signUp = async(req,res) => {
                 email : email
             }
         })
-
+        
         if (client.length) throw new BadRequest("User already exists")
 
         const salt = await generateSalt()

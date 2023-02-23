@@ -16,6 +16,12 @@ const Film = pool.define('film', {
         type: Sequelize.INTEGER,
         allowNull: false
     },
+    poster_path : {
+        type: Sequelize.STRING
+    },
+    backdrop_path : {
+        type : Sequelize.STRING
+    },
     created_at : {
         type:Sequelize.DATE,
     },

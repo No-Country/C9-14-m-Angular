@@ -1,5 +1,7 @@
 const {pool} = require('../index.js')
 const Sequelize = require('sequelize');
+const { User } = require('./user.js');
+const { List } = require('./list.js');
 
 
 const List_likes = pool.define('list_likes', {
@@ -10,11 +12,18 @@ const List_likes = pool.define('list_likes', {
     },
     list_id: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        references: {
+            model : List,
+            key: 'id'
+        }
+
     },
     client_id: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        references: {
+            model : User,
+            key: 'id'
+        }
     },
     created_at : {
         type:Sequelize.DATE,
