@@ -4,11 +4,17 @@ const getAll =  async (req,res) => {
 
     let rows = await Film.findAll()
 
-    rows.map((x)=> x.dataValues)
+    rows = rows.map((x)=> x.dataValues)
 
-    res.send(rows)
+    const duplicates = rows
+    .map((x)=> x.title+x.year)
+    .filter((x,i,arr)=> arr.indexOf(x) !== i)
+
+
+    res.json({result: rows, duplicates: !duplicates.length ? false : true})
 
 }
+
 
 
 module.exports = {

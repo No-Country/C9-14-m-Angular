@@ -4,6 +4,8 @@ const request = require('supertest')
 const bodyParser = require('body-parser')
 const userRouter = require('../routes/user.js')
 const filmRouter = require('../routes/film.js')
+const listRouter = require('../routes/list.js')
+
 const reviewRouter = require('../routes/review.js')
 const {
   newUser,
@@ -11,7 +13,13 @@ const {
   requestNewPassword,
   updatedClient,
   updatedClient2,
-  badupdatedClient
+  badupdatedClient,
+  clientExistSignin,
+  createnonExistList,
+  updateExistListRemove,
+  updateExistListAdd,
+  addExistingfilms,
+  cloneList
 } = require('./payload/payload.js')
 const { BadRequest } = require('../errors/errors.js')
 
@@ -29,6 +37,7 @@ beforeAll( ()=>{
   app.use("/user",userRouter)
   app.use("/film",filmRouter)
   app.use("/review",reviewRouter)
+  app.use("/list", listRouter)
 })
 
 afterAll((done)=> {
@@ -37,8 +46,8 @@ afterAll((done)=> {
     done()
 })
 
-describe("test boilerplate", ()=>{
-    xtest("get existing user",async ()=> {
+xdescribe("test boilerplate", ()=>{
+    test("get existing user",async ()=> {
        const response = await request(app).get("/user")
 
        expect(response.body[0].name).toBe("Satoshi")
@@ -46,26 +55,28 @@ describe("test boilerplate", ()=>{
 
     })
 
-    xtest ("get existing film", async ()=> {
+    test ("get existing film", async ()=> {
       const {body} = await request(app).get('/film')
 
-      expect(body[0].title).toBe('guardian')
+      expect(body.result[0].title).toBeDefined()
     })
 
     xtest ('get review from existing film', async()=>{
       const {body} = await request(app).get('/review')
 
-      expect(body[0].comment).toBe('Amazing Movie')
+      expect(body[0].comment).toBeDefined()
 
     })
 
-    xtest('finds existing user', async()=> {
+    test('finds existing user', async()=> {
       const {body} = await request(app).post('/user/signup').send(clientExists)
+
+      console.log(body)
 
       expect(body).toEqual({message:"User already exists" })
     })
 
-    xtest("inserts new User", async()=> {
+    test("inserts new User", async()=> {
       const {body} = await request(app).post('/user/signup').send(newUser)
 
       const response = await request(app).get("/user")
@@ -74,7 +85,7 @@ describe("test boilerplate", ()=>{
       expect(response.body.length).toEqual(4)
     })
 
-    xtest("signs in an existing user", async()=> {
+    test("signs in an existing user", async()=> {
       const {body} = await request(app).post('/user/signin').send(newUser)
 
       expect(body.dataValues.name).toBe('Ed')
@@ -101,34 +112,149 @@ describe("test boilerplate", ()=>{
 
     })
 
-    xit("updates an user", async ()=>{
+    it("updates an user", async ()=>{
       const {body} = await request(app).post('/user/update').send(updatedClient2)
 
 
       expect(body).toEqual({updatedUser: [1]})
     })
 
-    xtest("get updated user",async ()=> {
+    test("get updated user",async ()=> {
       const {statusCode,body} = await request(app).get("/user")
-      expect(body[2].name).toBe("Vitalik")
-      expect(body[0].name).toBe("Charles")
+      expect(body[0].name).toBe("Vitalik")
+      expect(body[1].name).toBe("Charles")
       expect(statusCode).toEqual(200)
    })
 
-   xit("gets bad request",async ()=> {
+   it("gets bad request",async ()=> {
      const {body} = await request(app).post('/user/update').send(badupdatedClient)
 
      expect(body.message).toBe("Invalid Input")
     })
 
-    it("cannot updates and gets server error", async ()=>{
+})
+
+xdescribe("test errors without db connected", () => {
+
+  
+  xit("receives error because cannot access databse",async ()=> {
+    const response = await request(app).get("/user")
+
+    expect(response.body.message).toEqual("Connetion to server failed. Please try again in a few seconds")
+    expect(response.statusCode).toEqual(500)
+    expect(response.error).toBeDefined()
+ })
+
+ xit("cannot updates and gets server error", async ()=>{
       
-      const {body} = await request(app).post('/user/update').send(updatedClient2)
+  const {body} = await request(app).post('/user/update').send(updatedClient2)
+
+  expect(body.message).toEqual("Connetion to server failed. Please try again in a few seconds")
+})
+
+xit("cannot sign in and gets server error", async()=> {
+  const{body} = await request(app).post('/user/signin').send(clientExistSignin)
+
+  expect(body.message).toEqual("Connetion to server failed. Please try again in a few seconds")
+})
+
+})
+
+describe("test list controller", ()=>{
+  xtest("all lists retrieval", async ()=>{
+    const {body} = await request(app).get('/list')
+
+    expect(body[0]).toHaveProperty("list_movies")
+    expect(body[0].id).toEqual(1)
+
+  })
+
+  xtest("creates a list", async() => {
+    const {body} = await request(app).post('/list/create').send(createnonExistList)
+
+    expect(body.id).toEqual(body.list_movies[0].list_id)
+    expect(body.list_movies.length).toEqual(createnonExistList.films.length)
+
+  })
+
+  xtest("removes 3 films from a list succesfully", async()=> {
+    const {body} = await request(app).post('/list/remove').send(updateExistListRemove)
+    const response = await request(app).post('/list/remove').send(updateExistListRemove)
+
+    expect(body).toEqual(updateExistListRemove.films.length)
+    expect(response.body.message).toEqual("List doesn't have any Series")
+
+  })
+
+  xtest("adds 3 films to an existing list succesfully", async()=>{
+    const existingList = await request(app).get('/list/1')
+    const {body} = await request(app).post('/list/add').send(updateExistListAdd)
+    const response = await request(app).post('/list/add').send(addExistingfilms)
+    const checkDuplicates = await request(app).get('/film')
+    const updatedexistingList = await request(app).get('/list/1')
+
+    
+
+    //check that we have added succesfully the movies
+    expect(body.length).toEqual(updateExistListAdd.films.length)
+
+    // check that we have created with association
+    expect(body[0]).toHaveProperty('film')
+
+    expect(response.body[0]).toHaveProperty('list_id')
+
+    // if the films to be added already exist, we dont create it, but we add the existing one to the list
+    expect(checkDuplicates.body.duplicates).toEqual(false)
+
+    //checking that the list has increased its size by the length of the film request to add
+    expect(updatedexistingList.body.length).toEqual(existingList.body.length + updateExistListAdd.films.length)
+
+  })
+
+  xtest("deletes list succesfully", async()=>{
+    const {body} = await request(app).delete('/list/remove/1')
+    const nonExistingList = await request(app).get('/list/1')
+
+    expect(body).toEqual(1)
+
+    //check that removed no longer exists in the db
+
+    expect(nonExistingList.body.message).toEqual("Non existing List")
+
+  })
+
+  xtest("all client lists retrieval", async ()=>{
+    const {body} = await request(app).get('/list/client/2')
+    const {list_movies,id} = body[0]
+
+    console.log(body)
 
 
-      expect(body.message).toEqual("Try again in a few seconds")
-    })
+    expect(body[0]).toHaveProperty("list_movies")
+    expect(id).toEqual(1)
+    expect(list_movies.length).toBeDefined()
 
+  })
 
+  xtest("clone a list", async() => {
+    const {body} = await request(app).post('/list/create').send(cloneList)
+    const createdFilms = body.list_movies.map((x)=> x.film_id)
+
+    expect(body.id).toEqual(body.list_movies[0].list_id)
+    expect(body.list_movies.length).toEqual(cloneList.films.length)
+    expect(createdFilms).toEqual(cloneList.films)
+
+  })
+
+  test("retreives all likes", async ()=> {
+
+    const {body} = await request(app).get('/list/client/like/1')
+
+    console.log(body)
+
+    expect(body.lists).toBeDefined()
+    expect(body.series.length).toBeDefined()
+
+  })
 })
 

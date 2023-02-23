@@ -1,20 +1,29 @@
 const {pool} = require('../index.js')
 const Sequelize = require('sequelize');
+const { User } = require('./user.js');
+const { List } = require('./list.js');
 
 
-const Watchlist = pool.define('watchlist', {
+const List_likes = pool.define('list_likes', {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
-    film_id: {
+    list_id: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        references: {
+            model : List,
+            key: 'id'
+        }
+
     },
     client_id: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        references: {
+            model : User,
+            key: 'id'
+        }
     },
     created_at : {
         type:Sequelize.DATE,
@@ -24,9 +33,12 @@ const Watchlist = pool.define('watchlist', {
         type:Sequelize.DATE,
         allowNull:false
     }
-});
+},{
+    timestamps: false,
+    tableName: 'list_likes'
+})
 
 
 module.exports = {
-    Watchlist
+    List_likes
 }

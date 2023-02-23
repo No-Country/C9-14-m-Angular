@@ -1,35 +1,37 @@
 const {pool} = require('../index.js')
 const Sequelize = require('sequelize');
+const { User } = require('./user.js');
 
 
-const Likes = pool.define('likes', {
+const List = pool.define('list', {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
-    review_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+    description : {
+        type : Sequelize.STRING,
+        allowNull: false,  
     },
-    client_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+    client_id : {
+        type : Sequelize.INTEGER,
+        references: {
+            model: User,
+            key: 'id',
+        }
     },
     created_at : {
         type:Sequelize.DATE,
-        allowNull:false
     },
     updated_at : {
         type:Sequelize.DATE,
-        allowNull:false
     }
 },{
     timestamps: false,
-    tableName: 'likes'
-})
+    tableName: 'list'
+});
 
 
 module.exports = {
-    Likes
+    List
 }
