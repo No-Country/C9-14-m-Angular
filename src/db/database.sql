@@ -127,7 +127,7 @@ FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_trigger();
 
 
-INSERT INTO client (name,last_name,password,email) VALUES ('Satoshi','Nakamoto','Angular14%','angular14m@gmail.com');
+INSERT INTO client (name,last_name,password,email) VALUES ('Satoshi','Nakamoto','Angular14','angular14m@gmail.com');
 INSERT INTO client (name,last_name,password,email) VALUES ('Charles','Hoskinson','cardano','charles@cardano');
 INSERT INTO client (name,last_name,password,email) VALUES ('Brad','Garlinghouse','ripple','brad@xrp');
 
