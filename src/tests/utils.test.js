@@ -1,4 +1,6 @@
+const { addRandomCover } = require('../utils/list.js')
 const {generateSalt,generateToken,checkPassword,hashPassword} = require('../utils/user.js')
+const { sampleList } = require('./payload/payload.js')
 
 
 describe("test utils",()=>{
@@ -28,6 +30,13 @@ describe("test utils",()=>{
         expect(token).toBeDefined()
 
     })
+    xtest("gets the covoer", ()=>{
+        const response = addRandomCover(sampleList)
+    
+        console.log(response)
+    })
+      
+      
 
 
 })

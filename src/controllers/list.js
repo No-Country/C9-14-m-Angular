@@ -1,7 +1,7 @@
-const {List,List_likes,List_movies, User, Film, ListListMovies, ListMoviesFilm} = require('../db/models/models')
+const {List,List_likes,List_movies, User, Film} = require('../db/models/models')
 const {ServerConnection,Api404Error,BadRequest} = require('../errors/errors.js')
 const { Op } = require("sequelize");
-const { Film_likes } = require('../db/models/film_likes');
+const { addRandomCover } = require('../utils/list');
 
 const getAll = async (req,res) => {
 
@@ -56,17 +56,33 @@ const getList = async(req,res) => {
     const {id} = req.params
 
     try {
-        const response = await List_movies.findAll({
+        // const response = await List_movies.findAll({
+        //     where: {
+        //         list_id : id
+        //     }
+        // })
+
+        const response = await List.findAll({
             where: {
-                list_id : id
-            }
+                id : id
+            },
+            attributes: ["id","description","client_id"],
+            include : [
+                {
+                    model: List_movies,
+                    attributes: ["id"],
+                    include: {
+                        model: Film,
+                        attributes:["id","title","year","poster_path","backdrop_path"]
+                    }
+                }
+            ]
         })
 
-        const result = response.map((x)=> x.dataValues)
 
-        if (!result.length) throw new BadRequest ("Non existing List")
+        if (!response.length) throw new BadRequest ("Non existing List")
 
-        res.send(result)
+        res.send(response)
 
     } catch (error) {
 
@@ -99,6 +115,7 @@ try {
         where: {
             client_id : id
         },
+        attributes: ["id","description"],
         include: [
             {
                 model: User,
@@ -109,7 +126,7 @@ try {
                 attributes: ['id', 'film_id'],
                 include: {
                     model: Film,
-                    attributes: ['id','title','year']
+                    attributes: ['id','title','year', 'poster_path', 'backdrop_path']
                 }
 
             }
@@ -117,7 +134,15 @@ try {
         ]
     })
 
-    const users = response.map((x)=> x.dataValues)
+    const users = response.map((x)=> {
+
+        x.dataValues.cover = addRandomCover(x.dataValues)
+
+        delete x.dataValues.list_movies
+
+        return  x.dataValues
+
+    })
 
     if (!users.length) {
         throw new BadRequest("No lists present at the database")
@@ -149,16 +174,14 @@ const createList = async (req,res) => {
 
     try {
 
-        
-        if(films[0].title) {
+        if (films)  {
 
-
-            const filmtitles = films.map((x)=> x.title)
+            const filmIds = films.map((x)=> x.id)
 
             const existingFilms = await Film.findAll({
                 where : {
-                    title : {
-                        [Op.or] : filmtitles
+                    id : {
+                        [Op.or] : filmIds
                     }
                 }
             })
@@ -178,15 +201,15 @@ const createList = async (req,res) => {
                       include:  List_movies.Film 
                     }]
                   });
-    
+                  
                   res.send(response)
         
             } else {
-                const filmsId = existingFilms.map((film)=> film.id)
+                // const filmsId = existingFilms.map((film)=> film.id)
                 const response = await List.create({
                     description,
                     client_id: userId,
-                    list_movies : filmsId.map((film)=> ({
+                    list_movies : filmIds.map((film)=> ({
                         film_id: film
                     }))
                 }, {
@@ -198,23 +221,13 @@ const createList = async (req,res) => {
 
             }
         } else {
-
             const response = await List.create({
                 description,
-                client_id: userId,
-                list_movies : films.map((film)=> ({
-                    film_id: film
-                }))
-            }, {
-                include: [{
-                  association: List.List_movies,
-                }]
-              });
-              res.send(response)    
+                client_id: userId
+            })
 
-
+            res.send(response)
         }
-
         
     } catch (error) {
 
@@ -264,10 +277,12 @@ const removeFilm = async (req,res) => {
                 }
             ]
         })
+
         
         if (!existData.length) throw new BadRequest("List doesn't exist")
 
         if (!existData[0]?.dataValues?.list_movies.length) throw new BadRequest("List doesn't have any Series")
+
 
         const response = await List_movies.destroy({
             where : {
@@ -303,12 +318,12 @@ const addFilm = async (req,res) => {
 
         //check if films already exist on our db
 
-        const filmtitles = films.map((x)=> x.title)
+        const filmIds = films.map((x)=> x.id)
 
         const existingFilms = await Film.findAll({
             where : {
-                title : {
-                    [Op.or] : filmtitles
+                id : {
+                    [Op.or] : filmIds
                 }
             }
         })
@@ -335,11 +350,11 @@ const addFilm = async (req,res) => {
 
         } else {
 
-            const filmsId = existingFilms.map((film)=> film.id)
+            // const filmsId = existingFilms.map((film)=> film.id)
 
-            console.log(filmsId)
+            // console.log(filmsId)
 
-            const response = filmsId.map( async (film)=> {
+            const response = filmIds.map( async (film)=> {
                 
                 return result = await List_movies.create({
                 list_id: listId,
@@ -407,77 +422,6 @@ const removeList = async (req,res) => {
     }
 }
 
-const getUserLikes = async (req,res)=> {
-
-    const {id} = req.params
-
-    try {
-
-        const response = await List_likes.findAll({
-            where: {
-                client_id : id
-            },
-            attributes: ['id'],
-            include : [
-                {
-                    model: List, 
-                    attributes: ['id', 'description', 'client_id'],
-                    include : {
-                        model: List_movies,
-                        attributes: ['id', 'film_id'],
-                        include: {
-                            model: Film,
-                            attributes: ['id','title','year', 'poster_path', 'backdrop_path']
-                        }
-                    }
-                }
-            ]
-        })
-
-        const seriesLikes = await Film_likes.findAll({
-            where: {
-                client_id : id
-            },
-            attributes: ['id'],
-            include : [
-                {
-                    model: Film, 
-                }
-            ]
-        })
-
-    
-        const list = response.map((x)=> x.dataValues)
-        const series = seriesLikes.map((x)=> x.dataValues)
-
-
-    
-        if (!list.length) {
-            throw new BadRequest("No lists present at the database")
-        }
-    
-        res.send({lists:list, series: series})
-    
-
-    } catch (error) {
-
-        if (error?.statusCode) {
-
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-
-        console.log(error)
-
-        
-    }
-}
-
 
 module.exports = {
     getAll,
@@ -487,7 +431,6 @@ module.exports = {
     getList,
     removeList,
     getUserLists,
-    getUserLikes
 }
 
 

@@ -40,6 +40,7 @@ module.exports = {
     List,
     List_movies,
     List_likes,
+    Film_likes
 
 }
 

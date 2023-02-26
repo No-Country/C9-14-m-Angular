@@ -40,31 +40,38 @@ const createnonExistList = {
   userId: 3,
   description: "I like action",
   films: [
-    {title: "john wick", year: 2010 },
-    {title: "john wick2", year: 2014}
+    {id: 25, title: "john wick", year: 2010,poster_path: "hola1", backdrop_path: "chau" },
+    {id: 26, title: "john wick2", year: 2014,poster_path: "hola2", backdrop_path: "chau" },    
   ]
+}
+
+const createEmptyList = {
+  
+  userId: 3,
+  description: "I like action",
+  
 }
 
 const cloneList = {
   userId : 3,
   description: "my fav",
   films : [
-    1,2,3
+    {id: 1},{id:2},{id:3}
   ]
 }
 
 const updateExistListRemove = {
 
   listId: 1,
-  films: [1,2,3]
+  films: [1,2,3,4]
 }
 
 const updateExistListAdd =  {
 
   listId : 1,
   films: [    
-  {title: "batman", year: 2010 },
-  {title: "batman 2", year: 2014}
+  {id: 100, title: "batman", year: 2010 },
+  {id: 101, title: "batman 2", year: 2014}
 ]
 }
 
@@ -72,10 +79,38 @@ const addExistingfilms =  {
 
   listId : 2,
   films: [    
-  {title: "batman", year: 2010 },
-  {title: "batman 2", year: 2014}
+  {id: 100,title: "batman", year: 2010 },
+  {id: 100,title: "batman 2", year: 2014}
 ]
 }
+
+const addLikes = {
+
+  userId: 3,
+  film : {
+    title: 'Pretty Little Liars',
+    year: '2010'
+  }
+
+}
+
+const sampleList = [
+  {
+    id: 1,
+    list_movies: [
+      {
+        id : 2,
+        poster_path: "hola",
+        backdrop_path: "chau"
+      },
+      {
+        id : 3,
+        poster_path: "hola2",
+        backdrop_path: "chau2"
+      }
+    ]
+  }
+]
 
   module.exports = {
     newUser,
@@ -89,5 +124,8 @@ const addExistingfilms =  {
     updateExistListRemove,
     updateExistListAdd,
     addExistingfilms,
-    cloneList
+    cloneList,
+    addLikes,
+    sampleList,
+    createEmptyList
   }

@@ -23,7 +23,7 @@ CREATE TABLE list (
 );
 
 CREATE TABLE film (
-    id SERIAL PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY,
     title VARCHAR(50) UNIQUE NOT NULL,
     year INT NOT NULL,
     poster_path VARCHAR (50),
@@ -131,14 +131,14 @@ INSERT INTO client (name,last_name,password,email) VALUES ('Satoshi','Nakamoto',
 INSERT INTO client (name,last_name,password,email) VALUES ('Charles','Hoskinson','cardano','charles@cardano');
 INSERT INTO client (name,last_name,password,email) VALUES ('Brad','Garlinghouse','ripple','brad@xrp');
 
-INSERT INTO film (title,year, poster_path, backdrop_path) VALUES ('Pretty Little Liars','2010','/vC324sdfcS313vh9QXwijLIHPJp.jpg', '/rQGBjWNveVeF8f2PGRtS85w9o9r.jpg');
-INSERT INTO film (title,year, poster_path, backdrop_path) VALUES ('Mr. Robot','2015','/esN3gWb1P091xExLddD2nh4zmi3.jpg', '/v8Y9yurHuI7MujWQMd8iL3Gy4B5.jpg');
-INSERT INTO film (title,year, poster_path, backdrop_path) VALUES ('Suits','2011', '/i6Iu6pTzfL6iRWhXuYkNs8cPdJF.jpg', '/8SAQqivlp74MZ7u55ccR1xa0Nby.jpg');
-INSERT INTO film (title,year, poster_path, backdrop_path) VALUES ('Game of Thrones', '2011', '/jIhL6mlT7AblhbHJgEoiBIOUVl1.jpg', '/mUkuc2wyV9dHLG0D0Loaw5pO2s8.jpg');
-INSERT INTO film (title,year, poster_path, backdrop_path) VALUES ('The Walking Dead', '2010', '/vxuoMW6YBt6UsxvMfRNwRl9LtWS.jpg', '/zYFQM9G5j9cRsMNMuZAX64nmUMf.jpg');
-INSERT INTO film (title,year, poster_path, backdrop_path) VALUES ('The Big Bang Theory', '2007', '/wQoosZYg9FqPrmI4zeCLRdEbqAB.jpg', '/nGsNruW3W27V6r4gkyc3iiEGsKR.jpg');
-INSERT INTO film (title,year, poster_path, backdrop_path) VALUES ('Doctor Who', '2005', '/igDhbYQTvact1SbNDbzoeiFBGda.jpg', '/cVWsigSx97cTw1QfYFFsCMcR4bp.jpg');
-INSERT INTO film (title,year, poster_path, backdrop_path) VALUES ('Breaking Bad','2008', '/1yeVJox3rjo2jBKrrihIMj7uoS9.jpg', '/eSzpy96DwBujGFj0xMbXBcGcfxX.jpg');
+INSERT INTO film (id,title,year, poster_path, backdrop_path) VALUES ('1','Pretty Little Liars','2010','/vC324sdfcS313vh9QXwijLIHPJp.jpg', '/rQGBjWNveVeF8f2PGRtS85w9o9r.jpg');
+INSERT INTO film (id,title,year, poster_path, backdrop_path) VALUES ('2','Mr. Robot','2015','/esN3gWb1P091xExLddD2nh4zmi3.jpg', '/v8Y9yurHuI7MujWQMd8iL3Gy4B5.jpg');
+INSERT INTO film (id,title,year, poster_path, backdrop_path) VALUES ('3','Suits','2011', '/i6Iu6pTzfL6iRWhXuYkNs8cPdJF.jpg', '/8SAQqivlp74MZ7u55ccR1xa0Nby.jpg');
+INSERT INTO film (id,title,year, poster_path, backdrop_path) VALUES ('4','Game of Thrones', '2011', '/jIhL6mlT7AblhbHJgEoiBIOUVl1.jpg', '/mUkuc2wyV9dHLG0D0Loaw5pO2s8.jpg');
+INSERT INTO film (id,title,year, poster_path, backdrop_path) VALUES ('5','The Walking Dead', '2010', '/vxuoMW6YBt6UsxvMfRNwRl9LtWS.jpg', '/zYFQM9G5j9cRsMNMuZAX64nmUMf.jpg');
+INSERT INTO film (id,title,year, poster_path, backdrop_path) VALUES ('6','The Big Bang Theory', '2007', '/wQoosZYg9FqPrmI4zeCLRdEbqAB.jpg', '/nGsNruW3W27V6r4gkyc3iiEGsKR.jpg');
+INSERT INTO film (id,title,year, poster_path, backdrop_path) VALUES ('7','Doctor Who', '2005', '/igDhbYQTvact1SbNDbzoeiFBGda.jpg', '/cVWsigSx97cTw1QfYFFsCMcR4bp.jpg');
+INSERT INTO film (id,title,year, poster_path, backdrop_path) VALUES ('8','Breaking Bad','2008', '/1yeVJox3rjo2jBKrrihIMj7uoS9.jpg', '/eSzpy96DwBujGFj0xMbXBcGcfxX.jpg');
 
 
 

@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const userRouter = require('../routes/user.js')
 const filmRouter = require('../routes/film.js')
 const listRouter = require('../routes/list.js')
+const likeRouter = require('../routes/like.js')
 
 const reviewRouter = require('../routes/review.js')
 const {
@@ -19,9 +20,10 @@ const {
   updateExistListRemove,
   updateExistListAdd,
   addExistingfilms,
-  cloneList
+  cloneList,
+  addLikes,
+  createEmptyList
 } = require('./payload/payload.js')
-const { BadRequest } = require('../errors/errors.js')
 
 
 const app = express()
@@ -38,6 +40,7 @@ beforeAll( ()=>{
   app.use("/film",filmRouter)
   app.use("/review",reviewRouter)
   app.use("/list", listRouter)
+  app.use('/like',likeRouter)
 })
 
 afterAll((done)=> {
@@ -46,7 +49,7 @@ afterAll((done)=> {
     done()
 })
 
-xdescribe("test boilerplate", ()=>{
+describe("test boilerplate", ()=>{
     test("get existing user",async ()=> {
        const response = await request(app).get("/user")
 
@@ -160,8 +163,8 @@ xit("cannot sign in and gets server error", async()=> {
 
 })
 
-describe("test list controller", ()=>{
-  xtest("all lists retrieval", async ()=>{
+xdescribe("test list controller", ()=>{
+  test("all lists retrieval", async ()=>{
     const {body} = await request(app).get('/list')
 
     expect(body[0]).toHaveProperty("list_movies")
@@ -169,7 +172,7 @@ describe("test list controller", ()=>{
 
   })
 
-  xtest("creates a list", async() => {
+  test("creates a list", async() => {
     const {body} = await request(app).post('/list/create').send(createnonExistList)
 
     expect(body.id).toEqual(body.list_movies[0].list_id)
@@ -177,7 +180,7 @@ describe("test list controller", ()=>{
 
   })
 
-  xtest("removes 3 films from a list succesfully", async()=> {
+  test("removes 3 films from a list succesfully", async()=> {
     const {body} = await request(app).post('/list/remove').send(updateExistListRemove)
     const response = await request(app).post('/list/remove').send(updateExistListRemove)
 
@@ -186,14 +189,15 @@ describe("test list controller", ()=>{
 
   })
 
-  xtest("adds 3 films to an existing list succesfully", async()=>{
+  test("adds 3 films to an existing list succesfully", async()=>{
     const existingList = await request(app).get('/list/1')
+
+    //raro que de el length 0
+
     const {body} = await request(app).post('/list/add').send(updateExistListAdd)
     const response = await request(app).post('/list/add').send(addExistingfilms)
     const checkDuplicates = await request(app).get('/film')
     const updatedexistingList = await request(app).get('/list/1')
-
-    
 
     //check that we have added succesfully the movies
     expect(body.length).toEqual(updateExistListAdd.films.length)
@@ -207,11 +211,34 @@ describe("test list controller", ()=>{
     expect(checkDuplicates.body.duplicates).toEqual(false)
 
     //checking that the list has increased its size by the length of the film request to add
-    expect(updatedexistingList.body.length).toEqual(existingList.body.length + updateExistListAdd.films.length)
+    expect(updatedexistingList.body[0].list_movies.length).toEqual(existingList.body[0].list_movies.length + updateExistListAdd.films.length)
 
   })
 
-  xtest("deletes list succesfully", async()=>{
+
+  test("all client lists retrieval", async ()=>{
+    const {body} = await request(app).get('/list/client/2')
+    console.log(body)
+    const {cover,id} = body[0]
+
+    expect(body[0]).toHaveProperty("cover")
+    expect(id).toEqual(1)
+    expect(cover.length).toBeDefined()
+
+  })
+
+  test("clone a list", async() => {
+    const {body} = await request(app).post('/list/create').send(cloneList)
+    const createdFilms = body.list_movies.map((x)=> x.film_id)
+    const requestIds = cloneList.films.map((x)=> x.id)
+
+    expect(body.id).toEqual(body.list_movies[0].list_id)
+    expect(body.list_movies.length).toEqual(cloneList.films.length)
+    expect(createdFilms).toEqual(requestIds)
+
+  })
+  
+  test("deletes list succesfully", async()=>{
     const {body} = await request(app).delete('/list/remove/1')
     const nonExistingList = await request(app).get('/list/1')
 
@@ -223,38 +250,44 @@ describe("test list controller", ()=>{
 
   })
 
-  xtest("all client lists retrieval", async ()=>{
-    const {body} = await request(app).get('/list/client/2')
-    const {list_movies,id} = body[0]
+  test("gets a list with all the series information", async()=>{
+    const {body} = await request(app).get('/list/2')
 
-    console.log(body)
+    expect(body[0].list_movies).toBeDefined()
+    expect(Object.keys(body[0].list_movies[0].film)).toEqual(["id","title","year","poster_path","backdrop_path"])
+  
+  })
 
+    test("creates an empty list", async() => {
+    const {body} = await request(app).post('/list/create').send(createEmptyList)
 
-    expect(body[0]).toHaveProperty("list_movies")
-    expect(id).toEqual(1)
-    expect(list_movies.length).toBeDefined()
+    expect(body.id).toBeDefined()
+    expect(Object.keys(body)).toEqual(["id","description","client_id","created_at","updated_at"])
 
   })
 
-  xtest("clone a list", async() => {
-    const {body} = await request(app).post('/list/create').send(cloneList)
-    const createdFilms = body.list_movies.map((x)=> x.film_id)
 
-    expect(body.id).toEqual(body.list_movies[0].list_id)
-    expect(body.list_movies.length).toEqual(cloneList.films.length)
-    expect(createdFilms).toEqual(cloneList.films)
+})
 
-  })
 
+describe("testing like router", ()=>{
   test("retreives all likes", async ()=> {
 
-    const {body} = await request(app).get('/list/client/like/1')
-
-    console.log(body)
+    const {body} = await request(app).get('/like/client/1')
 
     expect(body.lists).toBeDefined()
     expect(body.series.length).toBeDefined()
 
   })
+
+  test("pushes like to serie and responds ok" , async()=>{
+
+    const {body} = await request(app).post('/like').send(addLikes)
+
+    expect(Object.keys(body)).toEqual(['id', 'film_id','client_id','created_at','updated_at'])
+    expect(body.client_id).toEqual(addLikes.userId)
+
+  })
+
 })
 
