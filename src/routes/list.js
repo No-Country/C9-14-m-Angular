@@ -1,14 +1,15 @@
 const express = require('express')
 const {getAll,createList, removeFilm, addFilm, getList, removeList, getUserLists, getUserLikes} = require('../controllers/list.js')
+const auth = require('../middleware/middleware.js')
 const router = express.Router()
 
 
 
 router.get('/', getAll)
 router.get('/:id', getList)
-router.get('/client/:id', getUserLists)
+router.get('/client/all',auth, getUserLists)
 
-router.post('/create', createList)
+router.post('/create',auth, createList)
 router.post('/remove', removeFilm)
 router.post('/add', addFilm)
 
