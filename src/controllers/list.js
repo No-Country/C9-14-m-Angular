@@ -106,14 +106,13 @@ const getList = async(req,res) => {
 const getUserLists = async (req,res) => {
 
 
-    const {id} = req.params
-
+    const {userId} = req
     
 try {
 
     const response = await List.findAll({
         where: {
-            client_id : id
+            client_id : userId
         },
         attributes: ["id","description"],
         include: [
@@ -170,7 +169,9 @@ try {
 
 const createList = async (req,res) => {
 
-    const {userId, description,films} = req.body
+    const {description,films} = req.body
+
+    const {userId} = req
 
     try {
 
@@ -314,6 +315,8 @@ const removeFilm = async (req,res) => {
 const addFilm = async (req,res) => {
 
     const {listId,films} = req.body
+
+
     try {
 
         //check if films already exist on our db
