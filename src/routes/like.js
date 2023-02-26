@@ -1,12 +1,13 @@
 const express = require ('express')
 const { getUserLikes, pushLike } = require('../controllers/like')
+const auth = require('../middleware/middleware.js')
 
 const router = express.Router()
 
 
-router.get('/client/:id', getUserLikes)
+router.get('/client', getUserLikes)
 
-router.post('/', pushLike)
+router.post('/',auth, pushLike)
 
 
 module.exports = router

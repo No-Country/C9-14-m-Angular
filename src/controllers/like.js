@@ -5,7 +5,8 @@ const { Op } = require("sequelize");
 
 const pushLike = async (req,res) => {
 
-    const {userId,film} = req.body
+    const {film} = req.body
+    const {userId} = req
     const {serieId,title,year, posterPath, backdropPath} = film
 
 
