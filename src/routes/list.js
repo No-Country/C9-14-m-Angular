@@ -7,7 +7,6 @@ const router = express.Router()
 router.get('/', getAll)
 router.get('/:id', getList)
 router.get('/client/:id', getUserLists)
-router.get('/client/like/:id', getUserLikes)
 
 router.post('/create', createList)
 router.post('/remove', removeFilm)
