@@ -294,7 +294,7 @@ const removeFilm = async (req,res) => {
             }
         })
 
-        res.json(response)
+        res.send({message: "Serie deleted"})
 
     } catch (error) {
 
