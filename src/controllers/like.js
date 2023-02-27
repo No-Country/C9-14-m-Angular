@@ -27,6 +27,14 @@ const pushLike = async (req,res) => {
             await Film.create({id: id,title:name,year:year, poster_path: poster_path, backdrop_path: backdrop_path})
         }
 
+        const existLike = await Film_likes.findAll({
+            where: {
+                film_id: id,
+                client_id: userId
+            }
+        })
+
+        if(existLike.length) throw new BadRequest("Already liked")
         
         const response = await Film_likes.create({
             film_id: id,
@@ -57,13 +65,13 @@ const pushLike = async (req,res) => {
 
 const getUserLikes = async (req,res)=> {
 
-    const {id} = req.params
-
+    const {userId} = req
+ 
     try {
 
         const response = await List_likes.findAll({
             where: {
-                client_id : id
+                client_id : userId
             },
             attributes: ['id'],
             include : [
@@ -84,7 +92,7 @@ const getUserLikes = async (req,res)=> {
 
         const seriesLikes = await Film_likes.findAll({
             where: {
-                client_id : id
+                client_id : userId
             },
             attributes: ['id'],
             include : [
@@ -98,11 +106,9 @@ const getUserLikes = async (req,res)=> {
         const list = response.map((x)=> x.dataValues)
         const series = seriesLikes.map((x)=> x.dataValues)
 
-
-    
-        if (!list.length) {
-            throw new BadRequest("No lists present at the database")
-        }
+        // if (!list.length) {
+        //     throw new BadRequest("No lists present at the database")
+        // }
     
         res.send({lists:list, series: series})
     
