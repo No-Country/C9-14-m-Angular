@@ -23,7 +23,7 @@ const checkPassword =  async (password,savedPassword)=>{
 }
 
 const generateToken =  (id,email) => {
-    return  jwt.sign({id,email},APP_SECRET,{expiresIn:"1hr"})
+    return  jwt.sign({id,email},APP_SECRET,{expiresIn:"12hr"})
 }
 
 const  getGoogleOAuthURL = () => {
