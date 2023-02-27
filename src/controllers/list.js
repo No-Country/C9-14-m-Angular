@@ -137,7 +137,7 @@ try {
 
         x.dataValues.cover = addRandomCover(x.dataValues)
 
-        delete x.dataValues.list_movies
+        // delete x.dataValues.list_movies
 
         return  x.dataValues
 
