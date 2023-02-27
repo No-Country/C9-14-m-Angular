@@ -7,29 +7,29 @@ const pushLike = async (req,res) => {
 
     const {film} = req.body
     const {userId} = req
-    const {serieId,title,year, posterPath, backdropPath} = film
+    const {id,name,year, poster_path, backdrop_path} = film
 
 
     try {
 
         const serieExists = await Film.findAll({
-            // where : {
-            //     id : serieId
-            // }
             where : {
-                title: title
+                id : id
             }
+            // where : {
+            //     title: title
+            // }
         })
 
 
         if (!serieExists.length) {
 
-            await Film.create({title:title,year:year, poster_path: posterPath, backdrop_path: backdropPath})
+            await Film.create({id: id,title:name,year:year, poster_path: poster_path, backdrop_path: backdrop_path})
         }
 
         
         const response = await Film_likes.create({
-            film_id: serieExists[0].dataValues.id,
+            film_id: id,
             client_id: userId 
         },{fields : ["film_id","client_id"]})
         // const response = await Film_likes.create({film_id: serieId, user_id: userId })
