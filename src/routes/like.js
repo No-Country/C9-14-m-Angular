@@ -5,7 +5,7 @@ const auth = require('../middleware/middleware.js')
 const router = express.Router()
 
 
-router.get('/client', getUserLikes)
+router.get('/client',auth, getUserLikes)
 
 router.post('/',auth, pushLike)
 
