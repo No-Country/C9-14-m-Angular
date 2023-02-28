@@ -132,11 +132,51 @@ const getUserLikes = async (req,res)=> {
     }
 }
 
+const removeLike = async (req,res) => {
+
+    const {likeId} = req.body
+
+    try {
+
+        const response = await Film_likes.destroy({
+            where : {
+                id: likeId,
+            }
+        })
+        
+        if (response === 1) {
+
+            res.send({message: "deleted succesfully"})
+        } else{
+            throw new BadRequest("Like not present in the database")
+        }
+
+
+    } catch (error) {
+
+                if (error?.statusCode) {
+
+            res.status(error.statusCode).send({message: error.name})
+    
+        } else {
+    
+            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
+    
+            res.status(error.statusCode).send({message: error.name})
+        }
+
+        console.log(error)
+
+        
+    }
+}
+
 //agregar remover like
 
 module.exports = {
 
     pushLike,
-    getUserLikes
+    getUserLikes,
+    removeLike
 
 }
