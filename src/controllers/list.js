@@ -294,7 +294,15 @@ const removeFilm = async (req,res) => {
             }
         })
 
-        res.send({message: "Serie deleted"})
+        if (response === 1) {
+
+            res.send({message: "Serie deleted"})
+
+
+        } else {
+            throw new BadRequest ("Serie not present at the database")
+        }
+
 
     } catch (error) {
 

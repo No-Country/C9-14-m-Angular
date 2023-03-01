@@ -134,13 +134,13 @@ const getUserLikes = async (req,res)=> {
 
 const removeLike = async (req,res) => {
 
-    const {likeId} = req.body
+    const {serieId} = req.body
 
     try {
 
         const response = await Film_likes.destroy({
             where : {
-                id: likeId,
+                film_id: serieId,
             }
         })
         
