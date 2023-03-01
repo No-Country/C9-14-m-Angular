@@ -412,7 +412,14 @@ const removeList = async (req,res) => {
             }
         })
 
-        res.json(response)
+        if(response === 1) {
+
+        res.json({message: "List deleted"})
+
+    } else {
+
+        throw new BadRequest ("No List was found")
+    }
         
     } catch (error) {
 
