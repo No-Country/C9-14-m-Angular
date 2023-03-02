@@ -440,6 +440,46 @@ const removeList = async (req,res) => {
     }
 }
 
+const updateList = async(req,res) => {
+
+    const {description, serieId} = req.body
+    const {userId} = req
+
+    try {
+        
+        const response = await List.update({description:description},{
+            where: {
+                id: serieId,
+                client_id: userId
+            }
+        })
+
+        if(response[0] === 1) {
+
+            res.send({message : "List updated"})
+
+        } else {
+            throw new BadRequest ("List not found")
+        }
+
+    } catch (error) {
+
+        if (error?.statusCode) {
+
+            res.status(error.statusCode).send({message: error.name})
+    
+        } else {
+    
+            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
+    
+            res.status(error.statusCode).send({message: error.name})
+        }
+
+        console.log(error)
+        
+    }
+}
+
 
 module.exports = {
     getAll,
@@ -449,6 +489,7 @@ module.exports = {
     getList,
     removeList,
     getUserLists,
+    updateList
 }
 
 
