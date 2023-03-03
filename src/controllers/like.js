@@ -1,6 +1,9 @@
 const {List,List_likes,List_movies, User, Film, Film_likes} = require('../db/models/models')
 const {ServerConnection,Api404Error,BadRequest} = require('../errors/errors.js')
 const { Op } = require("sequelize");
+const redis = require("redis");
+const { redisClient } = require('../middleware/activity');
+
 
 
 const pushLike = async (req,res) => {
@@ -8,6 +11,8 @@ const pushLike = async (req,res) => {
     const {film} = req.body
     const {userId} = req
     const {id,name,year, poster_path, backdrop_path} = film
+    const idstring = 'userid'+userId.toString()
+    const date = new Date().toISOString()
 
 
     try {
@@ -41,6 +46,12 @@ const pushLike = async (req,res) => {
             client_id: userId 
         },{fields : ["film_id","client_id"]})
         // const response = await Film_likes.create({film_id: serieId, user_id: userId })
+
+        const cacheResults = await redisClient.lRange(`${idstring}`,0,100);
+        if(cacheResults.length < 20) {
+                await redisClient.rPush(`${idstring}`,["You liked serie"+ `${id}`, `${date}` ]);
+        }
+    
 
         res.send(response)
     
@@ -135,6 +146,11 @@ const getUserLikes = async (req,res)=> {
 const removeLike = async (req,res) => {
 
     const {serieId} = req.body
+    const {userId} = req
+    const idstring = 'userid'+userId.toString()
+    const date = new Date().toISOString()
+
+    
 
     try {
 
@@ -145,6 +161,12 @@ const removeLike = async (req,res) => {
         })
         
         if (response === 1) {
+
+            const cacheResults = await redisClient.lRange(`${idstring}`,0,100);
+            if(cacheResults.length < 20) {
+                    await redisClient.rPush(`${idstring}`,["You removed a like to serie "+`${serieId}`, `${date}` ]);
+            }
+        
 
             res.send({message: "deleted succesfully"})
         } else{
