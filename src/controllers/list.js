@@ -2,6 +2,8 @@ const {List,List_likes,List_movies, User, Film} = require('../db/models/models')
 const {ServerConnection,Api404Error,BadRequest} = require('../errors/errors.js')
 const { Op } = require("sequelize");
 const { addRandomCover } = require('../utils/list');
+const redis = require("redis");
+const { redisClient } = require('../middleware/activity');
 
 const getAll = async (req,res) => {
 
@@ -107,8 +109,9 @@ const getUserLists = async (req,res) => {
 
 
     const {userId} = req
-    
+ 
 try {
+
 
     const response = await List.findAll({
         where: {
@@ -147,6 +150,7 @@ try {
         throw new BadRequest("No lists present at the database")
     }
 
+
     res.send(users)
     
 } catch (error) {
@@ -172,8 +176,17 @@ const createList = async (req,res) => {
     const {description,films} = req.body
 
     const {userId} = req
+    const idstring = 'userid'+userId.toString()
+    const date = new Date().toISOString()
+
 
     try {
+
+        const cacheResults = await redisClient.lRange(`${idstring}`,0,100);
+        if(cacheResults.length < 20) {
+                await redisClient.rPush(`${idstring}`,["You created a list", `${date}` ]);
+        }
+    
 
         if (films)  {
 
@@ -255,6 +268,10 @@ const createList = async (req,res) => {
 const removeFilm = async (req,res) => {
 
     const {listId, films} = req.body
+    const {userId} = req
+    const idstring = 'userid'+userId.toString()
+    const date = new Date().toISOString()
+    
  
     try {
 
@@ -294,12 +311,19 @@ const removeFilm = async (req,res) => {
             }
         })
 
-        if (response === 1) {
+        if (response >= 1) {
+
+            const cacheResults = await redisClient.lRange(`${idstring}`,0,100);
+            if(cacheResults.length < 20) {
+                    await redisClient.rPush(`${idstring}`,["You removed a serie from list "+ `${listId}`, `${date}` ]);
+            }
+        
 
             res.send({message: "Serie deleted"})
 
 
         } else {
+            console.log(response)
             throw new BadRequest ("Serie not present at the database")
         }
 
@@ -323,6 +347,9 @@ const removeFilm = async (req,res) => {
 const addFilm = async (req,res) => {
 
     const {listId,films} = req.body
+    const {userId} = req
+    const idstring = 'userid'+userId.toString()
+    const date = new Date().toISOString()
 
 
     try {
@@ -338,6 +365,8 @@ const addFilm = async (req,res) => {
                 }
             }
         })
+
+
 
         if (!existingFilms.length) {
 
@@ -356,6 +385,12 @@ const addFilm = async (req,res) => {
             )
 
             const resolved = await Promise.all(response)
+
+            const cacheResults = await redisClient.lRange(`${idstring}`,0,100);
+            if(cacheResults.length < 20) {
+                    await redisClient.rPush(`${idstring}`,["You added a serie to list "+ `${listId}`, `${date}` ]);
+            }
+        
 
             res.send(resolved)
 
@@ -376,6 +411,12 @@ const addFilm = async (req,res) => {
         )
 
         const resolved = await Promise.all(response)
+
+        const cacheResults = await redisClient.lRange(`${idstring}`,0,100);
+        if(cacheResults.length < 20) {
+                await redisClient.rPush(`${idstring}`,["You added a serie to list "+ `${listId}`, `${date}` ]);
+        }
+    
 
         res.send(resolved)
 
@@ -403,6 +444,9 @@ const addFilm = async (req,res) => {
 const removeList = async (req,res) => {
 
     const {id} = req.params
+    const {userId} = req
+    const idstring = 'userid'+userId.toString()
+    const date = new Date().toISOString()
 
     try {
 
@@ -413,6 +457,12 @@ const removeList = async (req,res) => {
         })
 
         if(response === 1) {
+
+            const cacheResults = await redisClient.lRange(`${idstring}`,0,100);
+            if(cacheResults.length < 20) {
+                    await redisClient.rPush(`${idstring}`,["You delete list "+ `${id}`, `${date}` ]);
+            }
+        
 
         res.json({message: "List deleted"})
 
@@ -444,7 +494,8 @@ const updateList = async(req,res) => {
 
     const {description, serieId} = req.body
     const {userId} = req
-
+    const idstring = 'userid'+userId.toString()
+    const date = new Date().toISOString()
     try {
         
         const response = await List.update({description:description},{
@@ -455,7 +506,11 @@ const updateList = async(req,res) => {
         })
 
         if(response[0] === 1) {
-
+            
+            const cacheResults = await redisClient.lRange(`${idstring}`,0,100);
+            if(cacheResults.length < 20) {
+                    await redisClient.rPush(`${idstring}`,["You updated list "+ `${serieId}`, `${date}` ]);
+            }
             res.send({message : "List updated"})
 
         } else {
