@@ -5,7 +5,7 @@ const { commandOptions } = require ('redis');
 let redisClient
 (async () => {
   redisClient = redis.createClient({
-    url : 'rediss://red-cg0r20vdvk4ovd2900og:U4dyDgXMpCHveOnZ8vMADf18mrf7aIoW@oregon-redis.render.com:6379'
+    url : 'redis://red-cg0r20vdvk4ovd2900og:6379'
   });
 
   redisClient.on("error", (error) => console.error(`Error : ${error}`));
