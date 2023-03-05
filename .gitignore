@@ -1,8 +1,0 @@
-node_modules/
-.gitignore
-backend/docker-compose.dev.yml
-backend/Dockerfile
-backend/.env.dev
-backend/.env.staging
-backend/.env
-backend/workflow.yml
