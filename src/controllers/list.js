@@ -5,7 +5,7 @@ const { addRandomCover } = require('../utils/list');
 const redis = require("redis");
 const { redisClient } = require('../middleware/activity');
 
-const getAll = async (req,res) => {
+const getAll = async (req,res,next) => {
 
 try {
 
@@ -38,22 +38,13 @@ try {
     
 } catch (error) {
 
-    if (error?.statusCode) {
-
-        res.status(error.statusCode).send({message: error.name})
-
-    } else {
-
-        const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-
-        res.status(error.statusCode).send({message: error.name})
-    }
+next(error)
     
 }
      
 }
 
-const getList = async(req,res) => {
+const getList = async(req,res,next) => {
 
     const {id} = req.params
 
@@ -88,24 +79,12 @@ const getList = async(req,res) => {
 
     } catch (error) {
 
-        if (error?.statusCode) {
+        next(error)
 
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-
-        console.log(error)
-
-        
     }
 }
 
-const getUserLists = async (req,res) => {
+const getUserLists = async (req,res,next) => {
 
 
     const {userId} = req
@@ -155,23 +134,14 @@ try {
     
 } catch (error) {
 
-    if (error?.statusCode) {
+    next(error)
 
-        res.status(error.statusCode).send({message: error.name})
-
-    } else {
-
-        const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-
-        res.status(error.statusCode).send({message: error.name})
-    }
-    
 }
 
 
 } 
 
-const createList = async (req,res) => {
+const createList = async (req,res,next) => {
 
     const {description,films} = req.body
 
@@ -245,18 +215,7 @@ const createList = async (req,res) => {
         
     } catch (error) {
 
-        if (error?.statusCode) {
-
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-
-        console.log(error)
+        next(error)
     }
 }
 
@@ -265,7 +224,7 @@ const createList = async (req,res) => {
 // and create a new one with that information. Therefore, the user can start updating it because its him's
 
 
-const removeFilm = async (req,res) => {
+const removeFilm = async (req,res,next) => {
 
     const {listId, films} = req.body
     const {userId} = req
@@ -330,21 +289,11 @@ const removeFilm = async (req,res) => {
 
     } catch (error) {
 
-        if (error?.statusCode) {
-
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-        
+        next(error)
     }
 }
 
-const addFilm = async (req,res) => {
+const addFilm = async (req,res,next) => {
 
     const {listId,films} = req.body
     const {userId} = req
@@ -425,23 +374,12 @@ const addFilm = async (req,res) => {
         
     } catch (error) {
 
-        if (error?.statusCode) {
-
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-
-        console.log(error)
+        next(error)
         
     }
 }
 
-const removeList = async (req,res) => {
+const removeList = async (req,res,next) => {
 
     const {id} = req.params
     const {userId} = req
@@ -473,24 +411,12 @@ const removeList = async (req,res) => {
         
     } catch (error) {
 
-        if (error?.statusCode) {
+        next(error)
 
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-
-        console.log(error)
-
-        
     }
 }
 
-const updateList = async(req,res) => {
+const updateList = async(req,res,next) => {
 
     const {description, serieId} = req.body
     const {userId} = req
@@ -519,18 +445,7 @@ const updateList = async(req,res) => {
 
     } catch (error) {
 
-        if (error?.statusCode) {
-
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-
-        console.log(error)
+        next(error)
         
     }
 }

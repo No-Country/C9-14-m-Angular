@@ -7,6 +7,7 @@ const reviewRouter = require('./src/routes/review.js')
 const listRouter = require('./src/routes/list.js')
 const likeRouter = require('./src/routes/like.js')
 const activityRouter = require('./src/routes/activity.js')
+const { errorHandler } = require('./src/middleware/error.js')
 
 
 
@@ -22,3 +23,5 @@ app.use("/review",reviewRouter)
 app.use("/list", listRouter)
 app.use("/like",likeRouter)
 app.use('/activity',activityRouter)
+app.use(errorHandler)
+

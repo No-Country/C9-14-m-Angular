@@ -6,7 +6,7 @@ const { redisClient } = require('../middleware/activity');
 
 
 
-const pushLike = async (req,res) => {
+const pushLike = async (req,res,next) => {
 
     const {film} = req.body
     const {userId} = req
@@ -57,24 +57,12 @@ const pushLike = async (req,res) => {
     
     } catch (error) {
 
-        if (error?.statusCode) {
-
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-
-        console.log(error)
+        next(error)
 
     }
 }
 
-
-const getUserLikes = async (req,res)=> {
+const getUserLikes = async (req,res,next)=> {
 
     const {userId} = req
  
@@ -126,24 +114,12 @@ const getUserLikes = async (req,res)=> {
 
     } catch (error) {
 
-        if (error?.statusCode) {
-
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-
-        console.log(error)
-
+        next(error)
         
     }
 }
 
-const removeLike = async (req,res) => {
+const removeLike = async (req,res,next) => {
 
     const {serieId} = req.body
     const {userId} = req
@@ -176,24 +152,11 @@ const removeLike = async (req,res) => {
 
     } catch (error) {
 
-                if (error?.statusCode) {
+        next(error)
 
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
-
-        console.log(error)
-
-        
     }
 }
 
-//agregar remover like
 
 module.exports = {
 

@@ -31,7 +31,7 @@ try {
 
 }
 
-const updateUser = async (req,res) => {
+const updateUser = async (req,res,next) => {
 
     const { email, password, name, last_name } = req.body;
 
@@ -54,21 +54,12 @@ const updateUser = async (req,res) => {
         }
 
     } catch (error) {
-        
-        if (error?.statusCode) {
 
-            res.status(error.statusCode).send({message: error.name})
-
-        } else {
-
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-
-            res.status(error.statusCode).send({message: error.name})
-        }
+        next(error)
     }
 }
 
-const signUp = async(req,res) => {
+const signUp = async(req,res,next) => {
     const { email, password, name, last_name } = req.body;
 
     try {
@@ -105,21 +96,13 @@ const signUp = async(req,res) => {
         
     } catch (error) {
 
-        if (error?.statusCode) {
+        next(error)
 
-            res.status(error.statusCode).send({message: error.name})
-
-        } else {
-
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-
-            res.status(error.statusCode).send({message: error.name})
-        }
     }
 
 }
 
-const signIn = async (req,res) => {
+const signIn = async (req,res,next) => {
     const {email,password} = req.body
 
 try {
@@ -150,22 +133,13 @@ try {
 
 } catch (error) {
 
-    if (error?.statusCode) {
-
-        res.status(error.statusCode).send({message: error.name})
-
-    } else {
-
-        const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-
-        res.status(error.statusCode).send({message: error.name})
-    }
+    next(error)
 
 }
 
 }
 
-const forgotPassword = async (req,res) => {
+const forgotPassword = async (req,res,next) => {
     const {email} = req.body
     
     try {
@@ -228,21 +202,12 @@ const forgotPassword = async (req,res) => {
           }
           
     } catch (error) {
-        if (error?.statusCode) {
-
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
+        next(error)
     }
 
 }
 
-const establishNewPassword = async (req,res) => {
+const establishNewPassword = async (req,res,next) => {
 
     const {password} = req.body
     const {token} = req.params
@@ -279,16 +244,9 @@ const establishNewPassword = async (req,res) => {
 
 
     } catch (error) {
-        if (error?.statusCode) {
 
-            res.status(error.statusCode).send({message: error.name})
-    
-        } else {
-    
-            const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-    
-            res.status(error.statusCode).send({message: error.name})
-        }
+        next(error)
+
     }
 }
 
@@ -300,7 +258,7 @@ const googleRequest = (req,res) => {
 
 }
 
-const googleSignIn = async (req,res) => {
+const googleSignIn = async (req,res,next) => {
 
  try {
 
@@ -361,16 +319,7 @@ const googleSignIn = async (req,res) => {
 
  } catch (error) {
 
-    if (error?.statusCode) {
-
-        res.status(error.statusCode).send({message: error.name})
-
-    } else {
-
-        const error = new ServerConnection("Connetion to server failed. Please try again in a few seconds")
-
-        res.status(error.statusCode).send({message: error.name})
-    }
+    next(error)
 
 }
 }
