@@ -1,4 +1,5 @@
 node_modules/
+.gitignore
 backend/docker-compose.dev.yml
 backend/Dockerfile
 backend/.env.dev
